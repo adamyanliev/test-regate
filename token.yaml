@@ -11,7 +11,7 @@ security:
 paths:
   /tokens:
     get:
-      description: Retrieve a list of already created tokens.
+      description: Retrieve a list of already created tokens. New text added to test sync
       parameters:
         - name: filter
           in: query
