@@ -1,0 +1,176 @@
+openapi: 3.0.0
+info:
+  title: Regate Auth API
+  version: 1.0.0
+  description: API to create, retrieve and delete Bearer tokens to be used for authentication while using the Regate API.
+servers: 
+- url: https://api.regate.io/v1
+security:
+- basicAuth: []
+
+paths:
+  /tokens:
+    get:
+      description: Retrieve a list of already created tokens.
+      parameters:
+        - name: filter
+          in: query
+          description: A JSON array of objects, which specify how to filter tokens based on specific attributes (date, status, etc.). Different attributes allow for different operators, e.g. less than, greater than, equals, etc. Refer to our [documentation](#need_link) for detailed information.
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Token"
+        400:
+          description: Bad request. API request was not correctly formatted.
+          $ref: "#/components/responses/BadRequest"
+        401:
+          description: Unauthorized request. Wrong username or password.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+    post:
+      summary: Create a token.
+      description: This method allows you to create a token object.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Token'
+      responses:
+        201:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+        400:
+          description: Bad request. API request was not correctly formatted.
+          $ref: "#/components/responses/BadRequest"
+        401:
+          description: Unauthorized request. Wrong username or password.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+  /tokens/{token_id}:
+    delete:
+      summary: Delete a token.
+      description: This method allows you to delete a token by ID.
+      parameters:
+        - name: token_id
+          description: Token ID.
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        202:
+          description: Deletion was successful.
+        400:
+          description: Bad request. API request was not correctly formatted.
+          $ref: "#/components/responses/BadRequest"
+        401:
+          description: Unauthorized request. Wrong username or password.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  responses:
+    BadRequest:
+      description: "Bad input. See ErrorMessage for more information."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    Unauthorized:
+      description: "Your API credentials are not valid. Please review them."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    Forbidden:
+      description: "You don't have permission to access this URL."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    NotFound:
+      description: "URL does not exist."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    ServerError:
+      description: "Something wrong happened on our side, sorry for the inconvenience."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+
+  schemas:
+    Token:
+      properties:
+        token_id:
+          description: Unique ID for this token.
+          type: string
+          readOnly: true
+        access_token:
+          description: Contains the generated token. 
+          type: string
+        label:
+          description: A label for this token. Can be used to easy recognition.
+          type: string
+          minLength: 1
+          maxLength: 64
+          example: "Token for User1"
+
+    ErrorMessage:
+      properties:
+        ErrorMessage:
+          description: Error message describing the error.
+          type: string
+        ErrorCode:
+          description: Error code of the error.
+          type: string
+        ErrorRelatedTo:
+          description: A list of properties to which the error relates.
+          type: array
+          items:
+            type: string
+        ErrorIdentifier:
+          description: Error identifier used for tracing.
+          type: string
+          format: uuid
+        StatusCode:
+          description: Status code for this request.
+          type: integer
