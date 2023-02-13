@@ -9,7 +9,7 @@ security:
 paths:
   /customers:
     get:
-      summary: cccccccccccccccc Retrieve all customers
+      summary: newbranchstuff Retrieve all customers
       description: Retrieve a list of customers, specified by the selected filter parameters.
       operationId: getCustomers
       tags:
