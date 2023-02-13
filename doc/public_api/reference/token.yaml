@@ -12,6 +12,8 @@ security:
 paths:
   /tokens:
     get:
+      tags:
+        - Tokens
       summary: Retrieve all tokens.
       description: Retrieve a list of already created tokens.
       parameters:
