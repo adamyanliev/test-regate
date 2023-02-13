@@ -14,7 +14,7 @@ paths:
     get:
       tags:
         - Tokens
-      summary: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa Retrieve all tokens.
+      summary: Retrieve all tokens.
       description: Retrieve a list of already created tokens.
       parameters:
         - name: filter
