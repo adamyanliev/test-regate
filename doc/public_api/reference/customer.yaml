@@ -12,7 +12,7 @@ paths:
       description: Retrieve all customers
       operationId: getCustomers
       tags:
-        - invoice
+        - Customers
       parameters:
         - name: filter
           in: query
