@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Test Auth API
+  title: Token Auth API
   version: 1.0.0
   description: API to create, retrieve and delete Bearer tokens to be used for authentication while using the Regate API.
 servers: 
