@@ -117,7 +117,7 @@ components:
       type: apiKey
       in: header
       name: X-SECRET-KEY
-      format: password
+
 
   responses:
     BadRequest:
