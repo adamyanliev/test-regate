@@ -11,7 +11,7 @@ paths:
     get:
       tags:
       - Invoice
-      summary: Retrieve all invoices
+      summary: aaaaaaaaaaaaaaaaaaaaaaaaaaaa Retrieve all invoices
       description: Retrieve a list of invoices, specified by the selected filter parameters.
       operationId: getInvoice
       parameters:
