@@ -9,7 +9,7 @@ security:
 paths:
   /invoices:
     get:
-      description: Retrieve an invoice
+      description: Retrieve all invoices
       operationId: getInvoice
       tags:
         - invoice
@@ -152,99 +152,122 @@ components:
     CreateInvoice:
       type: object
       required:
-      - company_id
       - customer_id
-      - deposit_in_cents
       - deposit_currency
       - invoice_date
       - invoice_due_date
+      - payment_method
+      - transaction_lines_attributes
       properties:
-        company_id:
+##        holding_id: 
+##          type: string
+##          description: Unique UUID of the company.
+##          example: 1234567a-bcd8-ef90-123g-hijk45lmn678 
+        currency: ## new attribute. as currency is the same across attributes, this will be the currency that is valid for all amounts - already paid, VAT, product, total.
           type: string
-          description: ID of the company.
+          description: Invoice currency (ISO 4217).
+          default: EUR
         customer_id:
           type: string
-          description: ID of the customer, linked to this invoice.
-        customer_reference:
-          type: string
-        deposit_in_cents:
+          description: Unique UUID of the customer, linked to this invoice.
+          example: 9876543a-bc21-0def-98g7-6543hij21kl0
+      # customer_reference: ## can be removed
+      #   type: string
+        paid_deposit_cents: ## renamed from deposit_cents
           type: integer
-          description: The deposit amount (in cents) that has already been paid.
-        deposit_currency:
-          type: string
-          description: The currency of the already paid deposit amount.
+          description: The already paid deposit amount (in cents). Divide by 100 to receive the correct amount in the selected currency.
+          default: 0
+      # deposit_currency: ## should be removed and `currency` used instead.
+      #   type: string
+      #   description: The currency of the already paid deposit amount.
         footer_text:
           type: string
           description: The footer text on the invoice.
         invoice_date:
           type: string
+          format: date
           description: The date, on which the invoice was issued.
         invoice_delivery_date:
           type: string
+          format: date
           description: The date, on which the invoice was delivered.
         invoice_due_date:
           type: string
+          format: date
           description: The date, on which the invoice is due.
         payment_method_details:
-          type: string
-        payment_terms:
-          type: integer
+          type: string 
+      # payment_terms: 
+      #   type: string          
         peyment_terms_text:
           type: string
+          description: Text explaining the payment terms for this invoice.
+          readOnly: true
         purchase_order_text:
           type: string
+          description: Free text field used to record the purchase order ID.
         recurrence_attributes:
           type: object
-          description: **Optional** An object containing attributes, describing the details of any recurrence of payment linked to this invoice.
+          description: An object describing the details of any recurrence of payment linked to this invoice.
           properties:
             action:
               type: string
-            currency:
-              type: string
-            id:
-              type: string
-            recurrence_interval:
-              type: string
-            recurrence_amount:
-              type: integer
+              description: Indicates what action will be taken when the next recurrence interval starts. Can be to generate a new invoice or to generate an invoice draft.
+              enum: [generate_invoice, generate_draft]
             active_from:
               type: string
+              format: date
+              description: Start date for the recurring actions.
             active_to:
               type: string
-            document_template_id:
+              description: End date for the recurring actions.
+          # currency:  ## irrelevant, new overall `currency` attribute to be used instead
+          #   type: string
+          # id: ## not needed
+          #   type: string
+            recurrence_interval: ## renamed from `recurrence_unit` to make it clearer
               type: string
+              description: Indicates the interval of time, after which the recurrence action will trigger. Can be `monthly`, `trimestrial` or `annual`.
+              enum: [monthly, trimestrial, annual]
+            recurrence_date: ## renamed from `recurrence_value` to make it clearer
+              type: integer
+              description: The date of the month, on which the recurring action will take place.
+          # document_template_id: ## remove this
+          #   type: string
         payment_reference:
           type: string
-        subject_text:
+          description: External payment reference.
+        subject_text: ## changed name from object_text
           type: string
         transaction_lines_attributes:
           type: array
           description: An array of objects, each describing a transaction line within the invoice.
           items:
-            product_id:
-              type: string
-              description: Unique ID of the product for this line within the invoice.
-            quantity_in_cents:
-              type: integer
-              description: Indicates the amount of items in cents. Divide by 100 to receive the proper amount.
-            tax_financial_account_id:
-              type: string
-            title:
-              type: string
-              description: The name of the product on this transaction line.
-            total_price_in_cents:
-              type: integer
-              description: The total price for the products in this line in cents. Divide by 100 to receive the proper amount in the specified currency.
-            total_price_currency:
-              type: string
-            unit_price_cents: 
-              type: integer
-              description: The price for a single product described in this transaction line (in cents). Divide by 100 to receive the proper amount in the specified currency.
-            unit_price_currency: 
-              type: string
+            properties:
+              product_id:
+                type: string
+                description: Unique ID of the product for this line within the invoice.
+              quantity: 
+                type: number
+                format: double
+                description: Indicates the amount of items in cents. Divide by 100 to receive the proper amount.
+              tax_financial_account_id:
+                type: string
+              title:
+                type: string
+                description: The name of the product on this transaction line.
+              total_price_cents:
+                type: integer
+                description: The total price for the products in this line in cents. Divide by 100 to receive the proper amount in the specified currency.
+              total_price_currency:
+                type: string
+              unit_price_cents: 
+                type: integer
+                description: The price for a single product described in this transaction line (in cents). Divide by 100 to receive the proper amount in the specified currency.
+              unit_price_currency: 
+                type: string
         invoice_type:
           type: string
-          required: true
           description: Type of invoice.
         vat_paid: 
           type: string        
@@ -256,8 +279,377 @@ components:
       type: object
       description: An object containing the attributes for an invoice.
       properties:
-        asd:
+        ## accountant_archived_at:
+        ##   type: integer
+        already_paid:
+          type: boolean
+          description: Indicates whether the invoice has already been paid or not.
+        ## approved_at
+        ## archived_at
+        ## archived_from
+        ## archived_from_at
+        ## attachments_jpg
+        ## bank_account_id
+        ## bank_accounts
+        ## can_be_validated
+        comments:
+          type: array
+          description: An array of objects, each of which describes a comment left on this invoice.
+          items:
+            properties:
+              content:
+                type: string
+                description: The content of the comment.
+              created_at:
+                type: string
+                format: date-time
+                description: Timestamp when the comment was added to the invoice.
+              ## entity:
+              id:
+                type: string
+                description: ID of the comment.
+              ## read_at:
+              updated_at:
+                type: string
+                format: date-time
+                description: Timestamp when the comment was last updated.
+              user:
+                type: object
+                description: An object describing the Regate user that left this comment.
+                properties:
+                  ## avatar:
+                  ## company:
+                  email:
+                    type: string
+                    format: email
+                    description: Email address for the user that left the comment.
+                  firstname:
+                    type: string
+                    description: First name of the user that left the comment.
+                  id:
+                    type: string
+                    description: ID of the user that left the comment.
+                  lastname:
+                    type: string
+                    description: Last name of the user that left the comment.                
+                  name:
+                    type: string
+                    description: Full name of the user that left the comment.
+                  phone_number:
+                    type: string
+                    description: Phone number of the user that left the comment.
+                  role:
+                    type: string
+                    description: Role of the user that left the comment.
+
+        ## company_name
+        ## controller_id
+        created_at:
+          description: Timestamp when the invoice was created in Regate.
+          type: string
+          format: date-time
+        ## customer:
+        ##  type: object
+        ##  properties:
+
+
+
+        customer_id:
+          type: string
+          description: ID of he 
+        ## customer_reference:
+        deposit_cents:
           type: integer
+          description: The deposit amount (in cents) that has already been paid.
+        deposit_currency:
+          type: string
+          description: The currency of the already paid deposit amount.
+        ## description:
+        ## document_template_id:
+        ## duplicate:
+        ## duplicate_invoice_number:
+        ## ea_archived_at:
+        ## ea_recorded_at:
+        ## ea_state:
+        ## envelope_id:
+        ## esigned_at:
+        exchange_rate:
+          type: object
+          properties:
+            base: 
+              type: string
+              description: Base currency to be used for the invoice.
+          ##  created_at:
+          ##  data:
+            ##  type: object
+              ##properties:
+          ##  date:
+          ##  id:
+          ##  source:
+          ##  updated_at:
+        ## excluded_at:
+        ## exclusion_reason:
+        ## exported_at:
+        ## file:
+        footer_text:
+          type: string
+          description: The footer text on the invoice.
+        from_credit_card:
+          type: boolean
+          description: Indicates whether or not the payment should come from a credit card.
+        generated_at:
+          type: string
+          format: date-time
+          description: Indicates when the invoice has been generated
+        gross_amount_cents:
+          type: integer
+          description: Gross invoice amount (in cents).
+        gross_amount_currency:
+          type: string
+          description: Gross amount currency.
+        ## has_comments:
+        ## has_mailing:
+        ## holding: ### unnecessary
+        ## journal_entry:
+          ## type: object
+          ## properties:
+        net_amount_cents:
+          type: integer
+          description: Net invoice amount (in cents).
+        net_amount_currency:
+          type: string
+          description: Net amount currency.
+        subject_text:  ## property name - object_text
+          type: string
+          description: Subject line text of the invoice.
+        ## optional_fields:
+        ##   type: array
+        original_gross_amount_cents:
+          type: integer
+          description: Original gross amount (in cents). Can differ from `gross_amount_cents` if the invoice is created first as a draft and then edited.
+        original_gross_amount_currency:
+          type: string
+          description: Original gross amount currency. Can differ from `gross_amount_currency` if the invoice is created first as a draft and then edited.
+        original_net_amount_cents:
+          type: integer
+          description: Original net amount (in cents). Can differ from `net_amount_cents` if the invoice is created first as a draft and then edited.
+        original_net_amount_currency:
+          type: string
+          description: Original net amount currency. Can differ from `net_amount_currency` if the invoice is created first as a draft and then edited.
+        ## original_payload:
+        original_vat_amount_cents:
+          type: integer
+          description: Original VAT amount (in cents). Can differ from `vat_amount_cents` if the invoice is created first as a draft and then edited.
+        original_vat_amount_currency:
+          type: string
+          description: Original VAT amount currency. Can differ from `vat_amount_currency` if the invoice is created first as a draft and then edited.
+        other_information:
+          type: string
+          description: Additional text information linked to the invoice.
+        paid_amount:
+          type: integer
+          description: Amount that has been paid based on the invoice.
+        payed_at:
+          type: string
+          format: date-time
+          description: Timestamp when the invoice has been paid.
+        payment_in_progress_at:
+          type: string
+          format: date-time
+          description: Timestamp when the invoice payment has been initiated.
+        payment_method:
+          type: string
+          description: Payment method used to pay the invoice. Allowed values - XYZ
+        payment_method_other:
+          type: string
+          description: Description for a payment method used, if it's not in the listed ones available for payment_method.
+        payment_terms:
+          type: integer
+          description: not sure what this is
+        payment_terms_text:
+          type: string
+          description: Text describing the payment terms. This includes discount conditions, late payment  penalties and legal fixed compensation.
+        ## prepaid_from:
+        ## prepaid_to:
+        purchase_order_text:
+          type: string
+          description: Purchase order ID.
+        ## purchase_request:
+        ## received_at:
+        ## reconciled_at:
+        ## recorded_at:
+        ## recorded_by:
+        ## recorded_by_id:
+        recurrence:
+          type: object
+          description: Describes how the recurrence payments are set up, if any.
+          properties:
+            ## action:
+            active_from:
+              type: string
+              format: date
+              description: Start date for the recurring payment schedule. 
+            active_to:
+              type: string
+              format: date
+              description: End date for the recurring payment schedule. 
+            created_at:
+              type: string
+              format: date-time
+              description: Timestamp for when the recurring payment was updated.
+            currency:
+              type: string
+              description: Currency for the recurring payments.
+            ## document_template_id:
+            ## duration_unit:
+            ## duration_value:
+            ## id:
+            recurrence_unit:
+              type: string
+              description: Indicates the period of time, after which each recurring payment must be made.
+            recurrence_value:
+              type: integer
+              description: Date of the month for the recurring payment for the invoice.
+            schedule:
+              type: string
+              description: Recurring payment schedule. // need additional comments
+            updated_at:
+              type: string
+              format: date-time
+              description: Timestamp for when the recurring payment schedule was updated.
+        ref_payment:
+          type: string
+          description: Payment reference text.
+        reference:
+          type: integer
+          format: int32
+          description: Unclear what this is and if it's needed
+        ## refusal_reasons:
+        ## refused_at:
+        ## refused_by_firstname:
+        ## refused_by_id:
+        ## refused_by_lastname:
+        ## sent_at:
+        state:
+          type: string
+          description: Invoice state. ## Need to add additional info on possible states
+        ## submitted_at:
+        ## submitted_by_id:
+        supplier_id:
+          type: string
+          description: Probably not needed as this is a customer invoice
+        third_part_name:
+          type: string
+          description: The name of the customer that supplied this invoice.
+        ## timeline_events:
+        ## transaction_discounts:
+        transaction_header_net_total_price:
+          type: string
+          description: Text used as the header of the "net total price" column for the invoice transaction lines.
+        transaction_header_net_unit_price:
+          type: string
+          description: Text used as the header of the "net unit price" column for the invoice transaction lines.
+        transaction_header_product:
+          type: string
+          description: Text used as the header of the "product" column for the invoice transaction lines.
+        transaction_header_quantity:
+          type: string
+          description: Text used as the header of the "quantity" column for the invoice transaction lines.
+        transaction_header_vat:
+          type: string
+          description: Text used as the header of the "VAT" column for the invoice transaction lines.
+        transaction_lines:
+          type: array
+          description: An array of objects describing the transaction lines present in the invoice.
+          items:
+            properties:
+              ## comment:
+              ## created_at:
+              ## id:
+              product:
+                type: object
+                description: An object describing the product present in this transaction line.
+                properties:
+                  id: 
+                    type: string
+                    description: Product ID.
+                  title:
+                    type: string
+                    description: Name of the product.
+                  ## used_in_a_document_template:
+                  quantity_cents:
+                    type: integer
+                    format: int32
+                    description: Quantity (in cents) of this product in the transaction line.
+              ## tax_financial_account:
+                ## type: object
+                ## properties:
+              title:
+                type: string
+                description: Name of the product. ## duplicate with product property just above.
+              total_price_cents:
+                type: integer
+                format: int32
+                description: Total price (in cents) for the quantity of products on this transaction line.
+              total_price_currency:
+                type: string
+                description: Currency for the total price (in cents) for the quantity of products on this transaction line.
+              unit_price_cents:
+                type: integer
+                format: int32
+                description: Price (in cents) for a single unit of the product on this transaction line.
+              unit_price_currency:
+                type: string
+                description: Currency for the price of the product on this transaction line.
+              updated_at:
+                type: string
+                format: date-time
+                description: Timestamp when the transaction line was last updated.
+        transaction_taxes:
+          type: array
+          description: An array of objects describing the VAT tax to be paid for each transaction line.
+          items:
+            properties:
+              amount_cents:
+                type: integer
+                format: int32
+                description: Net amount (in cents).
+              amount_currency:
+                type: string
+                description: Currency for the net amount
+              ## created_at:
+              id:
+                type: string
+                description: ID for the VAT tax rate.
+              rate:
+                type: integer
+                description: VAT tax percentage rate.
+              ## tax_financial_account:
+                ## type: object
+        type:  ### shouldn't be necessary, as this endpoint only returns customer invoices
+          type: string
+          description: Type of invoice.
+        urgent:
+          type: boolean
+          description: Indicates whether the invoice is flagged as urgent or not.
+        vat_amount_cents:
+          type: integer
+          format: int32
+          description: Total VAT amount (in cents).
+        vat_amount_currency:
+          type: string
+          description: VAT amount currency.
+        vat_exemption_reason:
+          type: string
+          description: Reason for VAT exemption, if there is such.
+        vat_paid:
+          type: string
+          description: Not sure if this is relevant.
+        ## vats:
+        ## videocoding_failed_at:
+
+
+
 
 
 
