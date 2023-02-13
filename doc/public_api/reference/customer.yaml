@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Regate API
+  title: Customers
   version: "1.0"
 servers: 
 - url: https://api.regate.io/v1
@@ -40,7 +40,7 @@ paths:
           $ref: "#/components/responses/ServerError"
     post:
       tags:
-      - Customer
+      - Customers
       description: Create a new customer.
       requestBody:
         required: true
@@ -73,7 +73,7 @@ paths:
       description: Retrieve a specific customer
       operationId: getCustomer
       tags:
-        - invoice
+        - Customers
       parameters:
         - name: customer_id
           in: path

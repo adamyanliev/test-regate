@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Regate API
+  title: Invoices API
   version: "1.0"
 servers: 
 - url: https://api.regate.io/v1
@@ -9,10 +9,10 @@ security:
 paths:
   /invoices:
     get:
+      tags:
+      - Invoice
       description: Retrieve all invoices
       operationId: getInvoice
-      tags:
-        - invoice
       parameters:
         - name: filter
           in: query
@@ -74,6 +74,8 @@ paths:
 
   /invoices/{invoice_id}:
     get:
+      tags:
+      - Invoice
       description: Retrieve a single invoice.
       parameters:
       - name: invoice_id
