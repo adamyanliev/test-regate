@@ -9,7 +9,8 @@ security:
 paths:
   /customers:
     get:
-      description: Retrieve all customers
+      summary: Retrieve all customers
+      description: Retrieve a list of customers, specified by the selected filter parameters.
       operationId: getCustomers
       tags:
         - Customers
@@ -41,7 +42,7 @@ paths:
     post:
       tags:
       - Customers
-      description: Create a new customer.
+      summary: Create a new customer.
       requestBody:
         required: true
         content:
@@ -70,7 +71,7 @@ paths:
 
   /customers/{customer_id}:
     get:
-      description: Retrieve a specific customer
+      summary: Retrieve a specific customer
       operationId: getCustomer
       tags:
         - Customers

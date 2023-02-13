@@ -11,7 +11,8 @@ paths:
     get:
       tags:
       - Invoice
-      description: Retrieve all invoices
+      summary: Retrieve all invoices
+      description: Retrieve a list of invoices, specified by the selected filter parameters.
       operationId: getInvoice
       parameters:
         - name: filter
@@ -45,7 +46,7 @@ paths:
     post:
       tags:
       - Invoice
-      description: Create a new invoice.
+      summary: Create a new invoice.
       requestBody:
         required: true
         content:
@@ -76,7 +77,7 @@ paths:
     get:
       tags:
       - Invoice
-      description: Retrieve a single invoice.
+      summary: Retrieve a single invoice.
       parameters:
       - name: invoice_id
         in: path
