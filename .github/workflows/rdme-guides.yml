@@ -7,7 +7,7 @@ on:
     branches:
       - main
     paths:
-      - '/public_api/guides/**'
+      - 'public_api/guides/**'
 
 jobs:
   rdme-docs:
