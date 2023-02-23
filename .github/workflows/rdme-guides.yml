@@ -7,7 +7,7 @@ on:
     branches:
       - main
     paths:
-      - 'doc/public_api/guides/**'
+      - '/public_api/guides/**'
 
 jobs:
   rdme-docs:
@@ -19,4 +19,4 @@ jobs:
       - name: Run `docs` command 🚀
         uses: readmeio/rdme@v8
         with:
-          rdme: docs doc/public_api/guides/ --key=${{ secrets.README_API_KEY }} --version=1.0
+          rdme: docs /public_api/guides/ --key=${{ secrets.README_API_KEY }} --version=1.0
