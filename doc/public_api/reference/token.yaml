@@ -30,17 +30,7 @@ paths:
           style: deepObject
           explode: true
           allowReserved: true
-        - name: page
-          in: query
-          description: An object that allows you to limit the number of objects in the response, as well as offset the starting page in case the results are too many to be displayed on a single page. To limit the number of objects, set `limit` as the key and select its value. To select a later page, use `offset` as the key and set the value accordingly. See [Pagination](../guides/filtering.md#pagination) for more information.
-          required: false
-          schema:
-            type: object
-            additionalProperties:
-              type: integer
-          style: deepObject
-          explode: true
-          allowReserved: true
+        - $ref: "commons.yaml/parameters/Page"
       responses:
         200:
           description: Successful operation

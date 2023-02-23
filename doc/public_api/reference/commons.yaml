@@ -1,0 +1,81 @@
+openapi: 3.0.0
+
+info:
+  title: Commons
+  description: Common reusable schemas for Regate API
+  version: "1.0"
+
+paths: {}
+
+components:
+  schemas:
+    ErrorMessage:
+      properties:
+        ErrorMessage:
+          description: Error message describing the error.
+          type: string
+        ErrorCode:
+          description: Error code of the error.
+          type: string
+        ErrorRelatedTo:
+          description: A list of properties to which the error relates.
+          type: array
+          items:
+            type: string
+        ErrorIdentifier:
+          description: Error identifier used for tracing.
+          type: string
+          format: uuid
+        StatusCode:
+          description: Status code for this request.
+          type: integer
+
+  parameters:
+    Page:
+      name: page
+      in: query
+      description: An object that allows you to limit the number of objects in the response, as well as offset the starting page in case the results are too many to be displayed on a single page. To limit the number of objects, set `limit` as the key and select its value. To select a later page, use `offset` as the key and set the value accordingly. See [Pagination](../docs/filtering#pagination) for more information.
+      required: false
+      schema:
+        type: object
+        additionalProperties:
+          type: integer
+      style: deepObject
+      explode: true
+      allowReserved: true
+
+  responses:
+    BadRequest:
+      description: "Bad input. See ErrorMessage for more information."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+    NotFound:
+      description: "Resource not found"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+    NotAuthorized:
+      description: "Your API credentials are not valid. Please review them."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+    TechnicalError:
+      description: "Something wrong happened on our side, sorry for the inconvenience."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+    Forbidden:
+      description: "Forbidden. The server understood the request, but is refusing to fulfill it."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
