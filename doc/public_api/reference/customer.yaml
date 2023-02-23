@@ -20,7 +20,12 @@ paths:
           description: A JSON array of objects, allowing you to filter customers on specific attributes (date, status, amount, etc.). Different attributes allow for different operators, e.g. less than, greater than, equals, etc. Refer to our [documentation](#need_link) for detailed information.
           required: false
           schema:
-            type: string
+            type: object
+            additionalProperties:
+              type: string
+          style: deepObject
+          explode: true
+          allowReserved: true
       responses:
         200:
           description: Successful operation
