@@ -5,7 +5,7 @@ category: 63bd467548701e007e6ae9da
 slug: authentication
 ---
 
-# Token API authentication
+# Token API authentication aaa
 
 The Token API uses [HTTP basic authentication](https://en.wikipedia.org/wiki/Basic_access_authentication). In each request you need to provide your Regate API and secret key.
 
