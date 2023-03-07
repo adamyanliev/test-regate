@@ -17,7 +17,9 @@ paths:
       parameters:
         - name: filter
           in: query
-          description: A JSON array of objects, allowing you to filter customers on specific attributes (date, status, amount, etc.). Different attributes allow for different operators, e.g. less than, greater than, equals, etc. Refer to our [documentation](#need_link) for detailed information.
+          description: An object that defines the filters to use to retrieve only the items you require. Each field you add will be an additional filter to apply to the request. The filter key needs to be an attribute name (e.g. `label`), followed by an underscore and an operator name (e.g. `eq` for "equals"). For example, if you want to see all tokens with label `my_label`, the proper syntax will be `?filter[label_eq]=my_label`.
+          
+            For detailed information, please see the [Filtering section](../docs/filtering) in our Guides.
           required: false
           schema:
             type: object
@@ -26,6 +28,21 @@ paths:
           style: deepObject
           explode: true
           allowReserved: true
+        - name: page
+          in: query
+          description: Results are paginated. Set the value to the page you want to retieve.
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: Results are paginated. This parameter indicates how many results per page will be returned.
+          required: false
+          schema:
+            type: integer
+            default: 10
+            max: 1000
       responses:
         200:
           description: Successful operation
