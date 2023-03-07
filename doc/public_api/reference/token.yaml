@@ -30,7 +30,6 @@ paths:
           style: deepObject
           explode: true
           allowReserved: true
-        - $ref: "commons.yaml/parameters/Page"
       responses:
         200:
           description: Successful operation
