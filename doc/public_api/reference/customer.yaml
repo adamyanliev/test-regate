@@ -42,7 +42,7 @@ paths:
           schema:
             type: integer
             default: 10
-            max: 1000
+            maximum: 1000
       responses:
         200:
           description: Successful operation
