@@ -50,11 +50,11 @@ paths:
             application/json:
               schema:
                 type: object
-                  properties:
-                    links:
-                      $ref: "#/components/schemas/Links"
-                    data:  
-                      $ref: "#/components/schemas/OutputInvoice"
+                properties:
+                  links:
+                    $ref: "#/components/schemas/Links"
+                  data:  
+                    $ref: "#/components/schemas/OutputInvoice"
         400:
           description: Bad request. API request was not correctly formatted.
           $ref: "#/components/responses/BadRequest"
@@ -180,22 +180,22 @@ components:
     Links:
       type: object
       description: An object containing links to the URL for the current API call, as well as URL for the first, previous, next and last page of results, if the retrieved objects are too many to be displayed on a single page.
-        properties:
-          self:
-            type: string
-            description: The URL for the current page of results.
-          first:
-            type: string
-            description: The URL for the first page of results.
-          prev:
-            type: string
-            description: The URL for the previous page of results.
-          next:
-            type: string
-            description: The URL for the next page of results.
-          last:
-            type: string
-            description: The URL for the last page of results.
+      properties:
+        self:
+          type: string
+          description: The URL for the current page of results.
+        first:
+          type: string
+          description: The URL for the first page of results.
+        prev:
+          type: string
+          description: The URL for the previous page of results.
+        next:
+          type: string
+          description: The URL for the next page of results.
+        last:
+          type: string
+          description: The URL for the last page of results.
     OutputInvoice:
       type: object
       required:
