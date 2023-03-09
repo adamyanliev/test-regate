@@ -63,61 +63,59 @@ curl --request GET \
 
 # Pagination
 
-Use the `page` object when making a `GET` request if:
-- You want to limit the response to a certain number of returned objects.
-- In cases where the objects are too many and cannot be returned in a single page, you want to retrieve a specific page of objects.
+## Limit number of results
 
-The query parameter name should be `page[limit]` or `page[offset]`, respectively. Naturally, both parameters can be used concurrently.
-
-## Limit
-
-To set a limit for the returned objects per page, set the `page[limit]` parameter to the desired number. The default limit for returned objects is 10 and the maximum is 1000.
+To set a limit for the returned objects per page, set the `per_page` parameter to the desired number. The default limit for returned objects is 10 and the maximum is 1000.
 
 **Example**
 
 ```shell
 curl --request GET \
-     --url 'https://api.regate.io/v1/customer_invoices?page[limit]=100' \
+     --url 'https://api.regate.io/v1/customer_invoices?per_page=100' \
      --header 'accept: application/json'
 ```
 
-## Offset
+## Select specific page of results
 
-When the number of objects is too large to be returned in a single response page, you might want to retrieve a list starting from a specific page. Set the value of the `page[offset]` parameter to page you want to retrieve. The offset starts from `1`.
+When the number of objects is too large to be returned in a single response page, you might want to retrieve a list starting from a specific page. Set the value of the `page` parameter to page you want to retrieve. The offset starts from `1`.
 
 **Example**
 
 ```shell
 curl --request GET \
-     --url 'https://api.regate.io/v1/customer_invoices?page[offset]=5' \
+     --url 'https://api.regate.io/v1/customer_invoices?page=5' \
      --header 'accept: application/json'
 ```
 
-## Pagination indication the response body
+## Pagination in the response body
 
 Whenever you are making a `GET` request, the response body will include two objects:
 
 - `links` - Contains information on pagination
 - `data` - Contains the retrieved objects
 
-The `links` object contains three attributes:
+The `links` object contains three attributes, indicating specific URLs to call for different pages of results:
 
-- `self` - Indicates the URL the current call was made to.
-- `next` - Indicates which call to make if you want to retrieve the next page of results.
-- `last` - Indicates the call to make if you need to retrieve the last page of results.
+- `self` - The URL the current call was made to.
+- `first` - The URL to call for the first page of results.
+- `prev` - The URL to call for the previous page of results.
+- `next` - The URL to call for the next page of results.
+- `last` - The URL to call for the the last page of results.
 
 **Example**
 
-Here's an example of a `links` object after retrieving the second of 10 total pages of invoice objects:
+Here's an example of a `links` object after retrieving the third of 10 total pages of invoice objects:
 
 ```json
 {
   "links": {
-    "self": "https://api.regate.io/v1/customer_invoices?page[offset]=2",
-    "next": "https://api.regate.io/v1/customer_invoices?page[offset]=3",
-    "last": "https://api.regate.io/v1/customer_invoices?page[offset]=10"
+    "self": "https://api.regate.io/v1/customer_invoices?page=3",
+    "first": "https://api.regate.io/v1/customer_invoices?page=1",
+    "prev": "https://api.regate.io/v1/customer_invoices?page=2",
+    "next": "https://api.regate.io/v1/customer_invoices?page=4",
+    "last": "https://api.regate.io/v1/customer_invoices?page=10"
   },
   "data": [{
      ...
   }]
-}```
+}`

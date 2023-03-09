@@ -73,14 +73,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OutputCustomer'
+              $ref: '#/components/schemas/InputCustomer'
       responses:
         201:
           description: Invoice succesfully created.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OutputCustomer"
+                type: object
+                properties:
+                  links:
+                    $ref: "#/components/schemas/Links"
+                  data:  
+                    $ref: "#/components/schemas/OutputCustomer"
         400:
           description: Bad request. API request was not correctly formatted.
           $ref: "#/components/responses/BadRequest"
@@ -113,7 +118,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OutputCustomer"
+                type: object
+                properties:
+                  links:
+                    $ref: "#/components/schemas/Links"
+                  data:  
+                    $ref: "#/components/schemas/OutputCustomer"
         401:
           description: Unauthorized request. Token is missing or is invalid.
           $ref: "#/components/responses/Unauthorized"
@@ -187,23 +197,20 @@ components:
         last:
           type: string
           description: The URL for the last page of results.
-    OutputCustomer:
+
+    InputCustomer:
       type: object
       required:
       - address
-      - bank_accounts
       - name
       - payment_method
-      description: An object containing the attributes for a customer.
       properties:
-     #  accountant:
-     #  accounting_charge_account:
-     #  accounting_info_completed:
         address:
           type: object
           required:
           - address_line_1
-          - country
+          - country_code
+          - city
           - postal_code
           description: Address information for this customer.
           properties:
@@ -219,209 +226,288 @@ components:
               description: City address for this customer.
               type: string
               example: Paris
-            country:
-              type: object
-              required:
-              - iso_alpha2
-              description: Country address for this customer.
-              properties:
-             #  id: ## should be irrelevant to the user, so can be skipped
-                iso_alpha2:
-                  type: string
-                  description: Country code [ISO Alpha-2](https://www.iban.com/country-codes).
-                  example: FR
-                name: 
-                  type: string
-                  description: Country name. 
-                  example: France
-                  readOnly: true
-         #  id: ### Address ID is irrelevant to the users, can be skipped
+            country_code: ## renamed from address.country.iso_alpha2
+              type: string
+              description: Country code [ISO Alpha-2](https://www.iban.com/country-codes).
+              example: FR
             postal_code: ## renamed from zipcode
               type: string
               description: ZIP / Postal code.
               example: 75002
-      # archived_at:
-      #   type: string
-      #   format: date-time
-      #   description: Indicates when the customer was archived in Regate. If not archived, the value of this attribute will be `null`.
-        is_archived:   ### new attribute
-          type: boolean
-          description: Indicates whether the customer is archived or not.
-          example: false
-          readOnly: true
-      # auto_record: ## can be removed for now if we only want to retrieve barebones info
-      #   type: boolean
-      #   description: Indicates whether account receivables linked to this customer will be automatically recorded.
-      # auxiliary_account:    #### can be skipped for now as we are focused on providing information on customer for invoice creation.
-      #   type: object
-      #   description: Object with attributes that describe the sub-account linked to this customer.
-      #   properties:
-      #     account_chart_id:
-      #       type: string
-      #       format: uuid
-      #       description: Account chart ID.
-      #     account_chart_type:
-      #       type: string
-      #       description: Account chart type ID.
-      #     archived_at:
-      #       type: string
-      #       format: date-time
-      #       description: Indicates when this account was archived in Regate. If not archived, the value of this attribute will be `null`.
-      #     code:
-      #       type: string
-      #       description: Account code.
-      #     created_at:
-      #       type: string
-      #       format: date-time
-      #       description: Timestamp when the account was created.
-      #     exported_at:
-      #       type: string
-      #       format: date-time
-      #       description: Timestamp when the account was exported.
-          # holding_id:     
-          #   type: string
-          #   description: Holding ID linked to this account
-          # id:
-          #   type: string
-          #   description: Sub-account ID.
-          # is_default:
-          #   type: boolean
-          #   description: Indicates whether this is the default sub-account for this customer or not.
-          # name:
-          #   type: string
-          #   description: Sub-account name.
-          # type:
-          #   type: string
-          #   description: Sub-account type.
-        balance_cents:
-          type: integer
-          format: int32
-          description: Customer balance amount (including tax) in cents. Divide by 100 to retrieve the proper amount.
-          example: 10000
-          readOnly: true
-        bank_accounts:
-          type: array
-          description: An array containing information about the bank accounts linked to this customer.
-          items:
-            required:
-            - bank_name
-            - iban
-            - bic
-            properties:
-              bank_name:
-                type: string
-                description: Name of the bank, where this bank account resides.
-                example: BNP PARIBAS PUBLIC SECTOR SCF
-              bic:
-                type: string
-                description: BIC for this bank account.
-                example: BNPAFRPS
-              iban:
-                type: string
-                description: IBAN for this bank account.
-                example: FR8414508000506472869146N07
-              id:
-                type: string
-                description: Unique UUID for this bank account in Regate.
-                example: 123e4567-e89b-12d3-a456-426614174000
-                readOnly: true
-              is_used_for_payment_link:
-                type: boolean
-                description: Indicates if this bank account is displayed by default as a payment link when sending your invoices by email. Only one of your bank accounts can be selected to be used as a payment link.
-     #  client_reference: ## not sure what this does, so not sure whether we need it or not
-     #  company:   ### Not needed to be returned, we have the information displayed earlier in the response.
-      # contact:   #### can be skipped for now as we are focused on providing information on customer for invoice creation.
-      #   type: object
-      #   description: An object containing information about the contact person for this customer.
-      #   properties:
-      #     email:
-      #       type: string
-      #       format: email
-      #       description: Email address for the contact person.
-      #     firstname:
-      #       type: string
-      #       description: First name of the contact person.
-          # id:
-          # lastname:
-          #   type: string
-          #   description: Last name of the contact person.
-          # phone:number:
-          #   type: string
-          #   description: Phone number for the contact person.
-     #  customer_accounts
+        company_nb:
+          type: string
+          description: Customer's company identifier number. Should match the unique identifier used by all public bodies and administrative organisms in their relations with the company. For example, should match the SIREN number fr French companies.
+          example: 123456789
         customer_reference:
           type: string
           description: Customer reference. This is an identifier assigned to credit and debit transactions.
           example: REGATE
-        customer_type: ## if this isn't used, we should remove it, as 
+        customer_type: 
           type: string
           description: Customer type. Can be `company` or `individual`.
           enum: [company, individual]
           default: company
-        discount_condition:
-          type: string
-          description: Text explaining discount conditions. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `discount_condition` for the holding of the user.
-          example: "No discount granted for early payment."
         external_id:
           type: string
           description: External ID for this customer.
           example: REGATE_1
-     #  footer_text
-      # has_comments:
-      #   type: boolean
-      #   description: Indicates whether comments have been left linked to this customer.
-     #  has_customer_invoice_customer_requests:
-     #  holding_id    ### Irrelevant as with API key info can only be retrieved for the respective holding
-        id:
-          type: string
-          description: Unique customer UUID in Regate.
-          example: 9876543a-bc21-0def-98g7-6543hij21kl0 
-          readOnly: true
-        late_payment_penalties:
-          type: string
-          description: Text explaining late payment penalties. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `late_payment_penalties` for the holding of the user.
-          example: "In the event of non-payment on the due date, penalties calculated at three times the legal interest rate will be applied."
-        legal_fixed_compensation: 
-          type: string
-          description: Text explaining legal fixed compensation. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `legal_fixed_compensation` for the holding of the user.
-          example: "Any late payment will result in a fixed compensation for recovery costs of €40."
         name:
           type: string
           description: Customer name.
           example: Regate.
-     #  next_invoice
         payment_method:
           type: string
           description: Payment method selected for this customer in Regate.
           enum: [bank_transfer, bank_direct_debit, bill_of_exchange, credit_card, bank_check]
-      # payment_terms_text: ## since we have the other three properties, not sure if this is still relevant, should be removed from response and payload
-      #   type: string
-      #   description: Free text explaining the payment terms for invoices linked to this customer. Will contain the values of `discount_condition`, `late_payment_penalties` and `legal_fixed_compensation`. The text will be included in the footer of customer invoices.
-     #  pending
-     #  tax_financial_account
-     #  third_part_bank_accounts
-     #  type:
-     #  various_auxiliary_account
+        unit_nb:
+          type: string
+          description: Unique identifier used to identify the head office or a specific secondary establishment of the customer's company. For example, for French companies this should match the SIRET number.
+          example: 12345678912345
         vat_exemption_reason:
           type: string
           description: If the customer is exempt from paying VAT, this attribute will return the reason why.
           enum: [not_subject_to_vat, reverse_charge, eu_reverse_charge, intracommunity_acquisition, export_outside_eu] ## enum values changed to be understandable and matching the UI. for current values -- vat_code_0 = not_subject_to_vat ; vat_code_ae = reverse_charge ; vat_code_ue = eu_reverse_charge ; vat_code_e = intracommunity_acquisition ; vat_code_g = export_outside_eu
           default: null
-     #  vat_mode
         vat_number:
           type: string
           description: VAT number for this customer.
           example: FRXX999999999
           default: null
-      # vip:
-      #   type: boolean
-      #   description: Indicates whether this customer has been marked as a VIP in Regate or not.
-        yearly_billed_cents:
-          type: integer
-          format: int64
-          description: Yearly billed amount for this customer (in cents). Divide by 100 to get the proper amount.
-          example: 1500000
-          readOnly: true
+    
+    OutputCustomer:
+      type: array
+      description: An array of objects containing the attributes for the retrieved customers.
+      items:
+        properties:
+          address:
+            type: object
+            description: Address information for this customer.
+            properties:
+              address_line_1: ## renamed from address_1
+                type: string
+                description: Main customer address line.
+                example: 17 rue de la Banque              
+              address_line_2: ## renamed from address_2
+                type: string
+                description: Additional address details for this customer.
+                example: 2nd floor
+              city:
+                description: City address for this customer.
+                type: string
+                example: Paris
+              country_code:
+                type: string
+                description: Country code [ISO Alpha-2](https://www.iban.com/country-codes).
+                example: FR
+              country_name: 
+                type: string
+                description: Country name. 
+                example: France
+          #  id: ### Address ID is irrelevant to the users, can be skipped
+              postal_code: ## renamed from zipcode
+                type: string
+                description: ZIP / Postal code.
+                example: 75002
+        # archived_at:
+        #   type: string
+        #   format: date-time
+        #   description: Indicates when the customer was archived in Regate. If not archived, the value of this attribute will be `null`.
+          created_at: ## new attribute indicating customer creation date. useful for search
+            type: string
+            format: date-time
+            description: Timestamp indicating when the customer was created.
+        # auto_record: ## can be removed for now if we only want to retrieve barebones info
+        #   type: boolean
+        #   description: Indicates whether account receivables linked to this customer will be automatically recorded.
+        # auxiliary_account:    #### can be skipped for now as we are focused on providing information on customer for invoice creation.
+        #   type: object
+        #   description: Object with attributes that describe the sub-account linked to this customer.
+        #   properties:
+        #     account_chart_id:
+        #       type: string
+        #       format: uuid
+        #       description: Account chart ID.
+        #     account_chart_type:
+        #       type: string
+        #       description: Account chart type ID.
+        #     archived_at:
+        #       type: string
+        #       format: date-time
+        #       description: Indicates when this account was archived in Regate. If not archived, the value of this attribute will be `null`.
+        #     code:
+        #       type: string
+        #       description: Account code.
+        #     created_at:
+        #       type: string
+        #       format: date-time
+        #       description: Timestamp when the account was created.
+        #     exported_at:
+        #       type: string
+        #       format: date-time
+        #       description: Timestamp when the account was exported.
+            # holding_id:     
+            #   type: string
+            #   description: Holding ID linked to this account
+            # id:
+            #   type: string
+            #   description: Sub-account ID.
+            # is_default:
+            #   type: boolean
+            #   description: Indicates whether this is the default sub-account for this customer or not.
+            # name:
+            #   type: string
+            #   description: Sub-account name.
+            # type:
+            #   type: string
+            #   description: Sub-account type.
+          balance_cents:
+            type: integer
+            format: int32
+            description: Customer balance amount (including tax) in cents. Divide by 100 to retrieve the proper amount.
+            example: 10000
+            readOnly: true
+          bank_accounts:
+            type: object
+            description: An object containing information about the bank accounts linked to this customer. The bank accounts will be the same ones linked to the Regate holding.
+            properties:
+              object:
+                type: string
+                description: Indicates what type of data will be included in the `data` attribute. The value will always be `list`.
+                default: list
+              data:
+                type: array
+                description: An array of comment objects for this invoice. A maximum of 5 comments will be listed - in case there are more, the `has_more` attribute will be set to `true` and you can make a `GET` request to the URL in the `url` attribute to retrieve them all.
+                items:
+                  required:
+                  - bank_name
+                  - iban
+                  - bic
+                  properties:
+                    bank_name:
+                      type: string
+                      description: Name of the bank, where this bank account resides.
+                      example: BNP PARIBAS PUBLIC SECTOR SCF
+                    bic:
+                      type: string
+                      description: BIC for this bank account.
+                      example: BNPAFRPS
+                    iban:
+                      type: string
+                      description: IBAN for this bank account.
+                      example: FR8414508000506472869146N07
+                    id:
+                      type: string
+                      description: Unique UUID for this bank account in Regate.
+                      example: 123e4567-e89b-12d3-a456-426614174000
+                      readOnly: true
+                    is_used_for_payment_link:
+                      type: boolean
+                      description: Indicates if this bank account is displayed by default as a payment link when sending your invoices by email. Only one of your bank accounts can be selected to be used as a payment link.
+              has_more:
+                type: boolean
+                description: Indicates whether there are additional bank accounts not displayed in the `data` array.
+              url:
+                type: string
+                description: The URL to access the list of bank accounts.
+      #  client_reference: ## not sure what this does, so not sure whether we need it or not
+      #  company:   ### Not needed to be returned, we have the information displayed earlier in the response.
+        # contact:   #### can be skipped for now as we are focused on providing information on customer for invoice creation.
+        #   type: object
+        #   description: An object containing information about the contact person for this customer.
+        #   properties:
+        #     email:
+        #       type: string
+        #       format: email
+        #       description: Email address for the contact person.
+        #     firstname:
+        #       type: string
+        #       description: First name of the contact person.
+            # id:
+            # lastname:
+            #   type: string
+            #   description: Last name of the contact person.
+            # phone:number:
+            #   type: string
+            #   description: Phone number for the contact person.
+      #  customer_accounts
+          customer_reference:
+            type: string
+            description: Customer reference. This is an identifier assigned to credit and debit transactions.
+            example: REGATE
+          customer_type: ## if this isn't used, we should remove it, as 
+            type: string
+            description: Customer type. Can be `company` or `individual`.
+            enum: [company, individual]
+            default: company
+          discount_condition:
+            type: string
+            description: Text explaining discount conditions. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `discount_condition` for the holding of the user.
+            example: "No discount granted for early payment."
+          external_id:
+            type: string
+            description: External ID for this customer.
+            example: REGATE_1
+      #  footer_text
+        # has_comments:
+        #   type: boolean
+        #   description: Indicates whether comments have been left linked to this customer.
+      #  has_customer_invoice_customer_requests:
+      #  holding_id    ### Irrelevant as with API key info can only be retrieved for the respective holding
+          id:
+            type: string
+            description: Unique customer UUID in Regate.
+            example: 9876543a-bc21-0def-98g7-6543hij21kl0 
+            readOnly: true
+          is_archived:   ### new attribute
+            type: boolean
+            description: Indicates whether the customer is archived or not.
+            example: false
+            readOnly: true
+          late_payment_penalties:
+            type: string
+            description: Text explaining late payment penalties. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `late_payment_penalties` for the holding of the user.
+            example: "In the event of non-payment on the due date, penalties calculated at three times the legal interest rate will be applied."
+          legal_fixed_compensation: 
+            type: string
+            description: Text explaining legal fixed compensation. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `legal_fixed_compensation` for the holding of the user.
+            example: "Any late payment will result in a fixed compensation for recovery costs of €40."
+          name:
+            type: string
+            description: Customer name.
+            example: Regate.
+      #  next_invoice
+          payment_method:
+            type: string
+            description: Payment method selected for this customer in Regate.
+            enum: [bank_transfer, bank_direct_debit, bill_of_exchange, credit_card, bank_check]
+        # payment_terms_text: ## since we have the other three properties, not sure if this is still relevant, should be removed from response and payload
+        #   type: string
+        #   description: Free text explaining the payment terms for invoices linked to this customer. Will contain the values of `discount_condition`, `late_payment_penalties` and `legal_fixed_compensation`. The text will be included in the footer of customer invoices.
+      #  pending
+      #  tax_financial_account
+      #  third_part_bank_accounts
+      #  type:
+      #  various_auxiliary_account
+          vat_exemption_reason:
+            type: string
+            description: If the customer is exempt from paying VAT, this attribute will return the reason why.
+            enum: [not_subject_to_vat, reverse_charge, eu_reverse_charge, intracommunity_acquisition, export_outside_eu] ## enum values changed to be understandable and matching the UI. for current values -- vat_code_0 = not_subject_to_vat ; vat_code_ae = reverse_charge ; vat_code_ue = eu_reverse_charge ; vat_code_e = intracommunity_acquisition ; vat_code_g = export_outside_eu
+            default: null
+      #  vat_mode
+          vat_number:
+            type: string
+            description: VAT number for this customer.
+            example: FRXX999999999
+            default: null
+        # vip:
+        #   type: boolean
+        #   description: Indicates whether this customer has been marked as a VIP in Regate or not.
+          yearly_billed_cents:
+            type: integer
+            format: int64
+            description: Yearly billed amount for this customer (in cents). Divide by 100 to get the proper amount.
+            example: 1500000
+            readOnly: true
 
 
     ErrorMessage:
