@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Bank Accountss
+  title: Bank Accounts
   version: "1.0"
 servers: 
 - url: https://api.regate.io/v1
