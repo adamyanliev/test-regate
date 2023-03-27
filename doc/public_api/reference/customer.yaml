@@ -202,6 +202,7 @@ components:
       type: object
       required:
       - address
+      - bank_accounts
       - name
       - payment_method
       properties:
@@ -234,9 +235,18 @@ components:
               type: string
               description: ZIP / Postal code.
               example: 75002
+        bank_accounts:
+          type: array
+          description: An array of objects describing the bank accounts linked to this customer. The bank accounts will be displayed in sales invoices for this customer will be used to receive funds for these sales invoices.
+          items:
+            properties:
+              id:
+                type: string
+                description: ID of the bank account linked to this customer.  Make a GET request to /bank_accounts to retrieve the full list of available bank accounts.
+                example: 123e4567-e89b-12d3-a456-426614174000
         company_nb:
           type: string
-          description: Customer's company identifier number. Should match the unique identifier used by all public bodies and administrative organisms in their relations with the company. For example, should match the SIREN number fr French companies.
+          description: Customer's company identifier number. Should match the unique identifier used by all public bodies and administrative organisms in their relations with the company. For example, should match the SIREN number for French companies.
           example: 123456789
         customer_reference:
           type: string
@@ -365,7 +375,6 @@ components:
             format: int32
             description: Customer balance amount (including tax) in cents. Divide by 100 to retrieve the proper amount.
             example: 10000
-            readOnly: true
           bank_accounts:
             type: object
             description: An object containing information about the bank accounts linked to this customer. The bank accounts will be the same ones linked to the Regate holding.
@@ -376,12 +385,8 @@ components:
                 default: list
               data:
                 type: array
-                description: An array of comment objects for this invoice. A maximum of 5 comments will be listed - in case there are more, the `has_more` attribute will be set to `true` and you can make a `GET` request to the URL in the `url` attribute to retrieve them all.
+                description: An array of bank account objects for this invoice. A maximum of 5 bank accounts will be listed - in case there are more, the `has_more` attribute will be set to `true` and you can make a `GET` request to the URL in the `url` attribute to retrieve them all.
                 items:
-                  required:
-                  - bank_name
-                  - iban
-                  - bic
                   properties:
                     bank_name:
                       type: string
@@ -399,7 +404,6 @@ components:
                       type: string
                       description: Unique UUID for this bank account in Regate.
                       example: 123e4567-e89b-12d3-a456-426614174000
-                      readOnly: true
                     is_used_for_payment_link:
                       type: boolean
                       description: Indicates if this bank account is displayed by default as a payment link when sending your invoices by email. Only one of your bank accounts can be selected to be used as a payment link.
@@ -434,7 +438,7 @@ components:
             type: string
             description: Customer reference. This is an identifier assigned to credit and debit transactions.
             example: REGATE
-          customer_type: ## if this isn't used, we should remove it, as 
+          customer_type: ## if this isn't used, we should remove it
             type: string
             description: Customer type. Can be `company` or `individual`.
             enum: [company, individual]
@@ -457,12 +461,10 @@ components:
             type: string
             description: Unique customer UUID in Regate.
             example: 9876543a-bc21-0def-98g7-6543hij21kl0 
-            readOnly: true
           is_archived:   ### new attribute
             type: boolean
             description: Indicates whether the customer is archived or not.
             example: false
-            readOnly: true
           late_payment_penalties:
             type: string
             description: Text explaining late payment penalties. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `late_payment_penalties` for the holding of the user.
@@ -507,7 +509,6 @@ components:
             format: int64
             description: Yearly billed amount for this customer (in cents). Divide by 100 to get the proper amount.
             example: 1500000
-            readOnly: true
 
 
     ErrorMessage:

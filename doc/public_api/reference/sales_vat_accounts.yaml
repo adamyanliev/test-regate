@@ -1,0 +1,210 @@
+openapi: 3.0.0
+info:
+  title: Sales VAT accounts
+  version: "1.0"
+servers: 
+- url: https://api.regate.io/v1
+security:
+  - bearerAuth: []
+paths:
+  /sales_vat_accounts:
+    get:
+      summary: Retrieve all sales VAT accounts
+      description: Retrieve a list of sales VAT accounts used in sales invoice transaction lines. The returned list is filtered based on the specified query parameters.
+      operationId: getSalesVatAccounts
+      tags:
+        - Sales VAT accounts
+      parameters:
+        - name: filter
+          in: query
+          description: An object that defines the filters to use to retrieve only the items you require. Each field you add will be an additional filter to apply to the request. The filter key needs to be an attribute name (e.g. `label`), followed by an underscore and an operator name (e.g. `eq` for "equals"). For example, if you want to see all items with label `my_label`, the proper syntax will be `?filter[label_eq]=my_label`.
+          
+            For detailed information, please see the [Filtering section](../docs/filtering) in our Guides.
+          required: false
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+          style: deepObject
+          explode: true
+          allowReserved: true
+        - name: page
+          in: query
+          description: Results are paginated. Set the value to the page you want to retieve.
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: Results are paginated. This parameter indicates how many results per page will be returned.
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 1000
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  links:
+                    $ref: "#/components/schemas/Links"
+                  data:  
+                    $ref: "#/components/schemas/OutputSalesVatAccounts"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+  /sales_vat_accounts/{id}:
+    get:
+      summary: Retrieve a specific sales VAT account
+      operationId: getSalesVatAccount
+      tags:
+        - Sales VAT accounts
+      parameters:
+        - name: id
+          in: path
+          description: Unique UUID of the sales VAT account you want to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:  
+                    $ref: "#/components/schemas/OutputSalesVatAccounts"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+  responses:
+    BadRequest:
+      description: "Bad input. See ErrorMessage for more information."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    Unauthorized:
+      description: "Your API credentials are not valid. Please review them."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    Forbidden:
+      description: "You don't have permission to access this URL."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    NotFound:
+      description: "URL does not exist."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    ServerError:
+      description: "Something wrong happened on our side, sorry for the inconvenience."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+
+  schemas:
+    Links:
+      type: object
+      description: An object containing links to the URL for the current API call, as well as URL for the first, previous, next and last page of results, if the retrieved objects are too many to be displayed on a single page.
+      properties:
+        self:
+          type: string
+          description: The URL for the current page of results.
+        first:
+          type: string
+          description: The URL for the first page of results.
+        prev:
+          type: string
+          description: The URL for the previous page of results.
+        next:
+          type: string
+          description: The URL for the next page of results.
+        last:
+          type: string
+          description: The URL for the last page of results.
+
+        
+
+    
+    OutputSalesVatAccounts:
+      type: array
+      description: An array of objects containing the attributes for the retrieved sales VAT accounts.
+      items:
+        properties:
+          created_at:
+            type: string
+            format: date-time
+            description: Timestamp indicating when this sales VAT account was created in the Regate app.
+            example: 2023-01-31T23:59:59.000Z
+          vat_account_id:
+            type: string
+            description: Inique UUID for this sales VAT account.
+            example: 123abc45-678d-9e01-23f4-5g678901hi23
+          rate:
+            type: integer
+            description: VAT tax percentage rate.
+            example: 20
+          label:
+            type: string
+            description: The label selected in Regate for this sales VAT account. 
+            example: Standard VAT 20% (France)
+
+    ErrorMessage:
+      properties:
+        ErrorMessage:
+          description: Error message describing the error.
+          type: string
+        ErrorCode:
+          description: Error code of the error.
+          type: string
+        ErrorRelatedTo:
+          description: A list of properties to which the error relates.
+          type: array
+          items:
+            type: string
+        ErrorIdentifier:
+          description: Error identifier used for tracing.
+          type: string
+          format: uuid
+        StatusCode:
+          description: Status code for this request.
+          type: integer
