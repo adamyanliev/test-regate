@@ -5,7 +5,7 @@ category: 63bd467548701e007e6ae9da
 slug: status-codes-and-errors
 ---
 
-# Overview aaa
+# Overview
 
 The Regate API uses standard HTTP response codes to indicate the success or failure of an API request. Overall:
 
