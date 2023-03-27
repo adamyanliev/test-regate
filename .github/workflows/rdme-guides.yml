@@ -5,7 +5,7 @@ name: ReadMe - update API guides 🦉
 on:
   push:
     branches:
-      - feature/CU-861m6wad0_Public-API---Customer-Invoices-and-Authentication
+      - main
     paths:
       - 'doc/public_api_v1/guides/**'
 
