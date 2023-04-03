@@ -75,9 +75,12 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/InputInvoice'
+            encoding: # The same level as schema
+              attachment: # Property name (see above)
+                contentType: image/png, image/jpeg            
       responses:
         201:
           description: sales invoice succesfully created.
@@ -208,6 +211,10 @@ components:
       - vat_paid
       description: An object containing the attributes for a sales invoice.
       properties:
+        attachment:
+          type: string
+          format: binary
+          description: Attached file.
         currency: 
           type: string
           description: Invoice currency (ISO 4217).
@@ -586,7 +593,7 @@ components:
             # total_price_currency:
             #   type: string
               unit_price_cents: 
-                type: integer
+                type: number
                 description: The price for a single product described in this transaction line (in cents). Divide by 100 to receive the proper amount in the specified currency.
                 example: 8000
             # unit_price_currency: 
