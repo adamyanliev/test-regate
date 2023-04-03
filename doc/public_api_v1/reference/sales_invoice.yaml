@@ -427,6 +427,24 @@ components:
           description: Exchange rate information for this invoice. If the invoice currency is EUR, the exchange rate will be 1.0.
           example: 1.0
           readOnly: true
+        file:
+          type: object
+          description: An object describing a PDF copy of the invoice, encoded in base64 format. 
+          properties:
+            filename:
+              type: string
+              description: The name of the file (without the format extension).
+              example: my_invoice
+            content_type:
+              type: string
+              description: Defines file format using a MIME type. At the moment only PDF is supported. See the official [MIME type list](https://www.iana.org/assignments/media-types/media-types.xhtml) for additional information.
+              enum: [application/pdf]
+            base64:
+              type: string
+              description: Base64 encoded content of invoice file.
+            url:
+              type: string
+              description: URL to download the invoice PDF copy.
         footer_text:
           type: string
           description: The footer text on the invoice.
