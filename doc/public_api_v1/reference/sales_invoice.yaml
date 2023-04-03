@@ -75,12 +75,9 @@ paths:
       requestBody:
         required: true
         content:
-          multipart/mixed:
+          application/json:
             schema:
               $ref: '#/components/schemas/InputInvoice'
-            encoding: 
-              file:
-                contentType: application/pdf
       responses:
         201:
           description: sales invoice succesfully created.
@@ -211,10 +208,6 @@ components:
       - vat_paid
       description: An object containing the attributes for a sales invoice.
       properties:
-        file:
-          type: string
-          format: binary
-          description: Attached file.
         currency: 
           type: string
           description: Invoice currency (ISO 4217).
@@ -223,6 +216,29 @@ components:
           type: string
           description: Unique UUID of the customer, linked to this invoice.
           example: 9876543a-bc21-0def-98g7-6543hij21kl0
+        file_url:
+          type: string
+          description: The URL for a PDF copy of the invoice you want attached to the invoice object. Only public links can be used to retrieve a file using the `file_url` attribute.
+          
+            **NOTE** - If `file` or `file_url` is not empty, setting a value for `invoice_number` is mandatory!
+          example: https://www.example/com/my_invoice.pdf
+        file:
+          type: object
+          description: An object describing a PDF copy of the invoice, encoded in base64 format. This will override the `file_url` value, if both are provided.
+          
+            **NOTE** - If `file` or `file_url` is not empty, setting a value for `invoice_number` is mandatory!
+          properties:
+            filename:
+              type: string
+              description: The name of the file (without the format extension).
+              example: my_invoice
+            content_type:
+              type: string
+              description: Defines file format using a MIME type. At the moment only PDF is supported. See the official [MIME type list](https://www.iana.org/assignments/media-types/media-types.xhtml) for additional information.
+              enum: [application/pdf]
+            base64:
+              type: string
+              description: Base64 encoded content of invoice file.
         footer_text:
           type: string
           description: The footer text on the invoice.
@@ -238,7 +254,9 @@ components:
           example: 2023-01-31
         invoice_number:
           type: string
-          description: Invoice number. **Mandatory, when a file is attached to the POST request!**
+          description: Invoice number. If no value is provided, the invoice number will be automatically generated, based on the Accounts receivable numbering logic set up in the Regate app (under Settings > Accounting > General information).
+          
+            **Mandatory, if either `file` or `file_url` values are not empty!**
         other_information:
           type: string
           description: Free text for additional information relating to this invoice.
@@ -432,6 +450,9 @@ components:
           format: date
           description: The date, on which the invoice is due.
           example: 2023-01-31
+        invoice_number:
+          type: string
+          description: Invoice number. By default, the invoice number is automatically generated, based on the Accounts receivable numbering logic set up in the Regate app (under Settings > Accounting > General information). However, it can be set manually during the POST request.
         gross_amount_cents:
           type: integer
           description: Gross invoice amount (in cents).
