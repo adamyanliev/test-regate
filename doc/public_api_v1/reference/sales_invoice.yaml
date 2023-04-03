@@ -78,8 +78,8 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/InputInvoice'
-            encoding: # The same level as schema
-              attachment: # Property name (see above)
+            encoding: 
+              file:
                 contentType: image/png, image/jpeg            
       responses:
         201:
@@ -211,7 +211,7 @@ components:
       - vat_paid
       description: An object containing the attributes for a sales invoice.
       properties:
-        attachment:
+        file:
           type: string
           format: binary
           description: Attached file.
