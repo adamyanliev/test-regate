@@ -75,12 +75,12 @@ paths:
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          multipart/mixed:
             schema:
               $ref: '#/components/schemas/InputInvoice'
             encoding: 
               file:
-                contentType: image/png, image/jpeg            
+                contentType: application/pdf
       responses:
         201:
           description: sales invoice succesfully created.
@@ -236,6 +236,9 @@ components:
           format: date
           description: The date, on which the invoice is due.
           example: 2023-01-31
+        invoice_number:
+          type: string
+          description: Invoice number. **Mandatory, when a file is attached to the POST request!**
         other_information:
           type: string
           description: Free text for additional information relating to this invoice.
