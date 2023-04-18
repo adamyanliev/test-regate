@@ -78,7 +78,7 @@ paths:
               $ref: '#/components/schemas/InputProduct'
       responses:
         201:
-          description: Invoice succesfully created.
+          description: Product succesfully created.
           content:
             application/json:
               schema:
