@@ -177,7 +177,7 @@ components:
             example: 2023-01-31T23:59:59.000Z
           vat_account_id:
             type: string
-            description: Inique UUID for this sales VAT account.
+            description: Unique UUID for this sales VAT account.
             example: 123abc45-678d-9e01-23f4-5g678901hi23
           rate:
             type: integer

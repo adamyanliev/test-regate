@@ -53,8 +53,10 @@ paths:
                 properties:
                   links:
                     $ref: "#/components/schemas/Links"
-                  data:  
-                    $ref: "#/components/schemas/OutputBankAccounts"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OutputBankAccounts"
         401:
           description: Unauthorized request. Token is missing or is invalid.
           $ref: "#/components/responses/Unauthorized"

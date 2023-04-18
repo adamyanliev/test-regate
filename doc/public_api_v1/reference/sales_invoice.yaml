@@ -53,8 +53,10 @@ paths:
                 properties:
                   links:
                     $ref: "#/components/schemas/Links"
-                  data:  
-                    $ref: "#/components/schemas/OutputInvoice"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OutputInvoice"
         400:
           description: Bad request. API request was not correctly formatted.
           $ref: "#/components/responses/BadRequest"
