@@ -54,9 +54,7 @@ paths:
                   links:
                     $ref: "#/components/schemas/Links"
                   data:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/OutputInvoice"
+                    $ref: "#/components/schemas/OutputInvoice"
         400:
           description: Bad request. API request was not correctly formatted.
           $ref: "#/components/responses/BadRequest"
@@ -338,342 +336,344 @@ components:
 
 
     OutputInvoice:
-      type: object
-      description: An object containing the attributes for a sales invoice.
-      properties:
-        ## accountant_archived_at:
-        ##   type: integer
-        already_paid:
-          type: boolean
-          description: Indicates whether the invoice has already been paid or not.
-          example: false
-        ## approved_at
-        ## archived_at
-        ## archived_from
-        ## archived_from_at
-        ## attachments_jpg
-        ## bank_account_id
-        ## bank_accounts
-        ## can_be_validated
-        comments:
-          type: array
-          description: An array of objects, each of which describes a comment left on this invoice.
-          items:
+      type: array
+      items:
+        type: object
+        description: An object containing the attributes for a sales invoice.
+        properties:
+          ## accountant_archived_at:
+          ##   type: integer
+          already_paid:
+            type: boolean
+            description: Indicates whether the invoice has already been paid or not.
+            example: false
+          ## approved_at
+          ## archived_at
+          ## archived_from
+          ## archived_from_at
+          ## attachments_jpg
+          ## bank_account_id
+          ## bank_accounts
+          ## can_be_validated
+          comments:
+            type: array
+            description: An array of objects, each of which describes a comment left on this invoice.
+            items:
+              properties:
+                content:
+                  type: string
+                  description: The content of the comment.
+                  example: Needs review.
+                created_at:
+                  type: string
+                  format: date-time
+                  description: Timestamp when the comment was added to the invoice.
+                  example: 2023-01-31T23:59:59.000Z
+                id:
+                  type: string
+                  description: ID of the comment.
+                  example: 12a34b5c-de67-8901-2f34-567gh8i901jk
+                updated_at:
+                  type: string
+                  format: date-time
+                  description: Timestamp when the comment was last updated.
+                  example: 2023-01-31T23:59:59.000Z
+                user:
+                  type: object
+                  description: An object describing the Regate user that left this comment.
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                      description: Email address for the user that left the comment.
+                      example: email@example.com
+                    firstname:
+                      type: string
+                      description: First name of the user that left the comment.
+                      example: John
+                    id:
+                      type: string
+                      description: ID of the user that left the comment.
+                      example: a1bc23b4-ef5g-6789-h01i-234j567k8lmn
+                    lastname:
+                      type: string
+                      description: Last name of the user that left the comment.
+                      example: Doe
+                    name:
+                      type: string
+                      description: Full name of the user that left the comment.
+                      example: John Doe
+                    phone_number:
+                      type: string
+                      description: Phone number of the user that left the comment.
+                      example: +331234567890
+                    role:
+                      type: string
+                      description: Role of the user that left the comment.
+                      example: CEO
+          created_at:
+            description: Timestamp when the invoice was created in Regate.
+            type: string
+            format: date-time
+            example: 2023-01-31T23:59:59.000Z
+          currency: ## new attribute. as currency is the same across attributes, this will be the currency that is valid for all amounts - already paid, VAT, product, total etc..
+            type: string
+            description: Invoice currency (ISO 4217).
+            default: EUR
+          customer_id:
+            type: string
+            description: Unique UUID of the customer, linked to this invoice.
+            example: 9876543a-bc21-0def-98g7-6543hij21kl0
+          exchange_rate: ## As users don't need the information about the exchange rates for all currencies, we should provide only the exchange rate relating to this invoice currency. currency is indicated with the new `currency` property, here we should only list the rate.
+            type: number
+            description: Exchange rate information for this invoice. If the invoice currency is EUR, the exchange rate will be 1.0.
+            example: 1.0
+            readOnly: true
+          file:
+            type: object
+            description: An object describing a PDF copy of the invoice, encoded in base64 format. 
             properties:
-              content:
+              filename:
                 type: string
-                description: The content of the comment.
-                example: Needs review.
-              created_at:
+                description: The name of the file (without the format extension).
+                example: my_invoice
+              content_type:
                 type: string
-                format: date-time
-                description: Timestamp when the comment was added to the invoice.
-                example: 2023-01-31T23:59:59.000Z
-              id:
+                description: Defines file format using a MIME type. At the moment only PDF is supported. See the official [MIME type list](https://www.iana.org/assignments/media-types/media-types.xhtml) for additional information.
+                enum: [application/pdf]
+              base64:
                 type: string
-                description: ID of the comment.
-                example: 12a34b5c-de67-8901-2f34-567gh8i901jk
-              updated_at:
+                description: Base64 encoded content of invoice file.
+              url:
                 type: string
-                format: date-time
-                description: Timestamp when the comment was last updated.
-                example: 2023-01-31T23:59:59.000Z
-              user:
-                type: object
-                description: An object describing the Regate user that left this comment.
-                properties:
-                  email:
-                    type: string
-                    format: email
-                    description: Email address for the user that left the comment.
-                    example: email@example.com
-                  firstname:
-                    type: string
-                    description: First name of the user that left the comment.
-                    example: John
-                  id:
-                    type: string
-                    description: ID of the user that left the comment.
-                    example: a1bc23b4-ef5g-6789-h01i-234j567k8lmn
-                  lastname:
-                    type: string
-                    description: Last name of the user that left the comment.
-                    example: Doe
-                  name:
-                    type: string
-                    description: Full name of the user that left the comment.
-                    example: John Doe
-                  phone_number:
-                    type: string
-                    description: Phone number of the user that left the comment.
-                    example: +331234567890
-                  role:
-                    type: string
-                    description: Role of the user that left the comment.
-                    example: CEO
-        created_at:
-          description: Timestamp when the invoice was created in Regate.
-          type: string
-          format: date-time
-          example: 2023-01-31T23:59:59.000Z
-        currency: ## new attribute. as currency is the same across attributes, this will be the currency that is valid for all amounts - already paid, VAT, product, total etc..
-          type: string
-          description: Invoice currency (ISO 4217).
-          default: EUR
-        customer_id:
-          type: string
-          description: Unique UUID of the customer, linked to this invoice.
-          example: 9876543a-bc21-0def-98g7-6543hij21kl0
-        exchange_rate: ## As users don't need the information about the exchange rates for all currencies, we should provide only the exchange rate relating to this invoice currency. currency is indicated with the new `currency` property, here we should only list the rate.
-          type: number
-          description: Exchange rate information for this invoice. If the invoice currency is EUR, the exchange rate will be 1.0.
-          example: 1.0
-          readOnly: true
-        file:
-          type: object
-          description: An object describing a PDF copy of the invoice, encoded in base64 format. 
-          properties:
-            filename:
-              type: string
-              description: The name of the file (without the format extension).
-              example: my_invoice
-            content_type:
-              type: string
-              description: Defines file format using a MIME type. At the moment only PDF is supported. See the official [MIME type list](https://www.iana.org/assignments/media-types/media-types.xhtml) for additional information.
-              enum: [application/pdf]
-            base64:
-              type: string
-              description: Base64 encoded content of invoice file.
-            url:
-              type: string
-              description: URL to download the invoice PDF copy.
-        footer_text:
-          type: string
-          description: The footer text on the invoice.
-          example: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-      # from_credit_card:
-      #   type: boolean
-      #   description: Indicates whether or not the payment should come from a credit card.
-      #   readOnly: true
-        invoice_date:
-          type: string
-          format: date
-          description: The date, on which the invoice was issued.
-          example: 2023-01-31
-        invoice_delivery_date:
-          type: string
-          format: date
-          description: The date, on which the invoice was delivered.
-          example: 2023-01-31
-        invoice_due_date:
-          type: string
-          format: date
-          description: The date, on which the invoice is due.
-          example: 2023-01-31
-        invoice_number:
-          type: string
-          description: Invoice number. By default, the invoice number is automatically generated, based on the Accounts receivable numbering logic set up in the Regate app (under Settings > Accounting > General information). However, it can be set manually during the POST request.
-        gross_amount_cents:
-          type: integer
-          description: Gross invoice amount (in cents).
-          example: 10000
-      # gross_amount_currency:
-      #   type: string
-      #   description: Gross amount currency.
-        ## has_comments:
-        ## has_mailing:
-        ## holding: ### unnecessary
-        ## journal_entry:
-          ## type: object
-          ## properties:
-        net_amount_cents:
-          type: integer
-          description: Net invoice amount (in cents).
-          example: 8000
-        other_information:
-          type: string
-          description: Free text for additional information relating to this invoice.
-          example: Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
-        paid_amount: 
-          type: integer
-          description: Amount that has been paid based on the invoice.
-          example: 0
-        paid_at: ## renamed from payed_at
-          type: string
-          format: date-time
-          description: Timestamp when the invoice has been paid.
-          example: 2023-01-31T23:59:59.000Z
-        already_paid_amount_cents: ## renamed from deposit_cents
-          type: integer
-          description: The already paid deposit amount (in cents) at the time of the invoice generation. Divide by 100 to receive the correct amount in the selected currency.
-          default: 0
-      # payment_in_progress_at:
-      #   type: string
-      #   format: date-time
-      #   description: Timestamp when the invoice payment has been initiated.
-        payment_method:
-          type: string
-          description: Payment method used to pay the invoice.
-          enum: [bank_transfer, bank_direct_debit, bill_of_exchange, credit_card, bank_check]
-        payment_method_other:
-          type: string
-          description: Description for a payment method used, if it's not in the listed ones available for `payment_method`.
-        payment_reference: ## renamed from ref_payment
-          type: string
-          description: External payment reference.
-          example: ABC_1234567890
-        payment_terms_text:
-          type: string
-          description: Text explaining the payment terms for this invoice. The text is comprised from the values of `discount_condition`, `late_payment_penalties` and `legal_fixed_compensation` attributes of the customer linked to this invoice.
-          readOnly: true
-        purchase_order_text:
-          type: string
-          description: Free text field used to record the purchase order ID.
-          example: 11111111
-        ## purchase_request:
-        ## received_at:
-        ## reconciled_at:
-        ## recorded_at:
-        ## recorded_by:
-        ## recorded_by_id:
-        recurrence_attributes:
-          type: object
-          description: This object describes the configuration for a recurring invoice (or invoice draft) generation. 
-          properties:
-            action:
-              type: string
-              description: Indicates what action will be taken when the next recurrence interval starts. Can be to generate a new sales invoice or to generate an invoice draft.
-              enum: [generate_invoice, generate_draft]
-            active_from:
-              type: string
-              format: date
-              description: Start date for the recurring actions.
-              example: 2023-01-31
-            active_to:
-              type: string
-              description: End date for the recurring actions.
-              example: 2023-01-31
-          # currency:  ## irrelevant, new overall `currency` attribute to be used instead
-          #   type: string
-          # id: ## not needed
-          #   type: string
-            recurrence_interval: ## renamed from `recurrence_unit` to make it clearer
-              type: string
-              description: Indicates the interval of time, after which the recurrence action will trigger. Can be `monthly`, `trimestrial` or `annual`.
-              enum: [monthly, trimestrial, annual] # renamed from month, trimestrial, year to make it grammatically correct and clear 
-            recurrence_day: ## renamed from `recurrence_value` to make it clearer
-              type: integer
-              description: The day of the month, on which the recurring action will take place.
-              example: 1
-          # document_template_id: ## remove this
-          #   type: string
-      # reference:
-      #   type: integer
-      #   format: int32
-      #   description: Unclear what this is and if it's needed
-        ## refusal_reasons:
-        ## refused_at:
-        ## refused_by_firstname:
-        ## refused_by_id:
-        ## refused_by_lastname:
-        ## sent_at:
-        state:
-          type: string
-          description: Invoice state. ## Need to add additional info on possible states
-          enum: [draft, created, received, recorded, excluded, paid, reconciled]
-        ## submitted_at:
-        ## submitted_by_id:
-        subject_text:  ## renamed from object_text
-          type: string
-          description: Subject line text of the invoice.
-          example: My new invoice!
-      # supplier_id:
-      #   type: string
-      #   description: Probably not needed as this is a sales invoice
-      # third_part_name:
-      #   type: string
-      #   description: The name of the customer that supplied this invoice.
-        ## timeline_events:
-        ## transaction_discounts:
-      # transaction_header_net_total_price:
-      #   type: string
-      #   description: Text used as the header of the "net total price" column for the invoice transaction lines.
-      # transaction_header_net_unit_price:
-      #   type: string
-      #   description: Text used as the header of the "net unit price" column for the invoice transaction lines.
-      # transaction_header_product:
-      #   type: string
-      #   description: Text used as the header of the "product" column for the invoice transaction lines.
-      # transaction_header_quantity:
-      #   type: string
-      #   description: Text used as the header of the "quantity" column for the invoice transaction lines.
-      # transaction_header_vat:
-      #   type: string
-      #   description: Text used as the header of the "VAT" column for the invoice transaction lines.
-        transaction_lines_attributes:
-          type: array
-          description: An array of objects, each describing a transaction line within the invoice.
-          items:
+                description: URL to download the invoice PDF copy.
+          footer_text:
+            type: string
+            description: The footer text on the invoice.
+            example: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        # from_credit_card:
+        #   type: boolean
+        #   description: Indicates whether or not the payment should come from a credit card.
+        #   readOnly: true
+          invoice_date:
+            type: string
+            format: date
+            description: The date, on which the invoice was issued.
+            example: 2023-01-31
+          invoice_delivery_date:
+            type: string
+            format: date
+            description: The date, on which the invoice was delivered.
+            example: 2023-01-31
+          invoice_due_date:
+            type: string
+            format: date
+            description: The date, on which the invoice is due.
+            example: 2023-01-31
+          invoice_number:
+            type: string
+            description: Invoice number. By default, the invoice number is automatically generated, based on the Accounts receivable numbering logic set up in the Regate app (under Settings > Accounting > General information). However, it can be set manually during the POST request.
+          gross_amount_cents:
+            type: integer
+            description: Gross invoice amount (in cents).
+            example: 10000
+        # gross_amount_currency:
+        #   type: string
+        #   description: Gross amount currency.
+          ## has_comments:
+          ## has_mailing:
+          ## holding: ### unnecessary
+          ## journal_entry:
+            ## type: object
+            ## properties:
+          net_amount_cents:
+            type: integer
+            description: Net invoice amount (in cents).
+            example: 8000
+          other_information:
+            type: string
+            description: Free text for additional information relating to this invoice.
+            example: Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+          paid_amount: 
+            type: integer
+            description: Amount that has been paid based on the invoice.
+            example: 0
+          paid_at: ## renamed from payed_at
+            type: string
+            format: date-time
+            description: Timestamp when the invoice has been paid.
+            example: 2023-01-31T23:59:59.000Z
+          already_paid_amount_cents: ## renamed from deposit_cents
+            type: integer
+            description: The already paid deposit amount (in cents) at the time of the invoice generation. Divide by 100 to receive the correct amount in the selected currency.
+            default: 0
+        # payment_in_progress_at:
+        #   type: string
+        #   format: date-time
+        #   description: Timestamp when the invoice payment has been initiated.
+          payment_method:
+            type: string
+            description: Payment method used to pay the invoice.
+            enum: [bank_transfer, bank_direct_debit, bill_of_exchange, credit_card, bank_check]
+          payment_method_other:
+            type: string
+            description: Description for a payment method used, if it's not in the listed ones available for `payment_method`.
+          payment_reference: ## renamed from ref_payment
+            type: string
+            description: External payment reference.
+            example: ABC_1234567890
+          payment_terms_text:
+            type: string
+            description: Text explaining the payment terms for this invoice. The text is comprised from the values of `discount_condition`, `late_payment_penalties` and `legal_fixed_compensation` attributes of the customer linked to this invoice.
+            readOnly: true
+          purchase_order_text:
+            type: string
+            description: Free text field used to record the purchase order ID.
+            example: 11111111
+          ## purchase_request:
+          ## received_at:
+          ## reconciled_at:
+          ## recorded_at:
+          ## recorded_by:
+          ## recorded_by_id:
+          recurrence_attributes:
+            type: object
+            description: This object describes the configuration for a recurring invoice (or invoice draft) generation. 
             properties:
-              product_id:
+              action:
                 type: string
-                description: Unique UUID of the product in Regate for this line within the invoice.
-                example: 1a234567-89b0-123c-45d6-e78fg90h1234
-              quantity: 
-                type: number
-                format: double
-                description: Indicates the amount of items in cents. Divide by 100 to receive the proper amount.
+                description: Indicates what action will be taken when the next recurrence interval starts. Can be to generate a new sales invoice or to generate an invoice draft.
+                enum: [generate_invoice, generate_draft]
+              active_from:
+                type: string
+                format: date
+                description: Start date for the recurring actions.
+                example: 2023-01-31
+              active_to:
+                type: string
+                description: End date for the recurring actions.
+                example: 2023-01-31
+            # currency:  ## irrelevant, new overall `currency` attribute to be used instead
+            #   type: string
+            # id: ## not needed
+            #   type: string
+              recurrence_interval: ## renamed from `recurrence_unit` to make it clearer
+                type: string
+                description: Indicates the interval of time, after which the recurrence action will trigger. Can be `monthly`, `trimestrial` or `annual`.
+                enum: [monthly, trimestrial, annual] # renamed from month, trimestrial, year to make it grammatically correct and clear 
+              recurrence_day: ## renamed from `recurrence_value` to make it clearer
+                type: integer
+                description: The day of the month, on which the recurring action will take place.
                 example: 1
-            # tax_financial_account_id:
+            # document_template_id: ## remove this
             #   type: string
-              title:
-                type: string
-                description: The name of the product on this transaction line.
-                example: My product
-              total_price_cents:
-                type: integer
-                description: The total price for the products in this line in cents. Divide by 100 to receive the proper amount in the specified currency.
-                example: 8000
-            # total_price_currency:
-            #   type: string
-              unit_price_cents: 
-                type: number
-                description: The price for a single product described in this transaction line (in cents). Divide by 100 to receive the proper amount in the specified currency.
-                example: 8000
-            # unit_price_currency: 
-            #   type: string
-        transaction_taxes:
-          type: array
-          description: An array of objects describing the VAT tax to be paid for each transaction line.
-          items:
-            properties:
-              amount_cents:
-                type: integer
-                format: int32
-                description: Net amount (in cents). Divide by 100 to retrieve the proper amount.
-                example: 8000
-              rate:
-                type: integer
-                description: VAT tax percentage rate.
-                example: 25
-        urgent:
-          type: boolean
-          description: Indicates whether the invoice is flagged as urgent or not.
-          default: false
-        vat_amount_cents:
-          type: integer
-          format: int32
-          description: Total VAT amount (in cents).
-          example: 2000
-        vat_exemption_reason:
-          type: string
-          description: If the customer is exempt from paying VAT, this attribute will return the reason why.
-          enum: [not_subject_to_vat, reverse_charge, eu_reverse_charge, intracommunity_acquisition, export_outside_eu] ## enum values changed to be understandable and matching the UI. for current values -- vat_code_0 = not_subject_to_vat ; vat_code_ae = reverse_charge ; vat_code_ue = eu_reverse_charge ; vat_code_e = intracommunity_acquisition ; vat_code_g = export_outside_eu
-          readOnly: true
-        vat_paid: 
-          type: string
-          description: Indicates when the VAT is paid - `receipts` meaning it is paid on receipts, `debits` meaning it is compensated for sales.
-          enum: [receipts, debits]
+        # reference:
+        #   type: integer
+        #   format: int32
+        #   description: Unclear what this is and if it's needed
+          ## refusal_reasons:
+          ## refused_at:
+          ## refused_by_firstname:
+          ## refused_by_id:
+          ## refused_by_lastname:
+          ## sent_at:
+          state:
+            type: string
+            description: Invoice state. ## Need to add additional info on possible states
+            enum: [draft, created, received, recorded, excluded, paid, reconciled]
+          ## submitted_at:
+          ## submitted_by_id:
+          subject_text:  ## renamed from object_text
+            type: string
+            description: Subject line text of the invoice.
+            example: My new invoice!
+        # supplier_id:
+        #   type: string
+        #   description: Probably not needed as this is a sales invoice
+        # third_part_name:
+        #   type: string
+        #   description: The name of the customer that supplied this invoice.
+          ## timeline_events:
+          ## transaction_discounts:
+        # transaction_header_net_total_price:
+        #   type: string
+        #   description: Text used as the header of the "net total price" column for the invoice transaction lines.
+        # transaction_header_net_unit_price:
+        #   type: string
+        #   description: Text used as the header of the "net unit price" column for the invoice transaction lines.
+        # transaction_header_product:
+        #   type: string
+        #   description: Text used as the header of the "product" column for the invoice transaction lines.
+        # transaction_header_quantity:
+        #   type: string
+        #   description: Text used as the header of the "quantity" column for the invoice transaction lines.
+        # transaction_header_vat:
+        #   type: string
+        #   description: Text used as the header of the "VAT" column for the invoice transaction lines.
+          transaction_lines_attributes:
+            type: array
+            description: An array of objects, each describing a transaction line within the invoice.
+            items:
+              properties:
+                product_id:
+                  type: string
+                  description: Unique UUID of the product in Regate for this line within the invoice.
+                  example: 1a234567-89b0-123c-45d6-e78fg90h1234
+                quantity: 
+                  type: number
+                  format: double
+                  description: Indicates the amount of items in cents. Divide by 100 to receive the proper amount.
+                  example: 1
+              # tax_financial_account_id:
+              #   type: string
+                title:
+                  type: string
+                  description: The name of the product on this transaction line.
+                  example: My product
+                total_price_cents:
+                  type: integer
+                  description: The total price for the products in this line in cents. Divide by 100 to receive the proper amount in the specified currency.
+                  example: 8000
+              # total_price_currency:
+              #   type: string
+                unit_price_cents: 
+                  type: number
+                  description: The price for a single product described in this transaction line (in cents). Divide by 100 to receive the proper amount in the specified currency.
+                  example: 8000
+              # unit_price_currency: 
+              #   type: string
+          transaction_taxes:
+            type: array
+            description: An array of objects describing the VAT tax to be paid for each transaction line.
+            items:
+              properties:
+                amount_cents:
+                  type: integer
+                  format: int32
+                  description: Net amount (in cents). Divide by 100 to retrieve the proper amount.
+                  example: 8000
+                rate:
+                  type: integer
+                  description: VAT tax percentage rate.
+                  example: 25
+          urgent:
+            type: boolean
+            description: Indicates whether the invoice is flagged as urgent or not.
+            default: false
+          vat_amount_cents:
+            type: integer
+            format: int32
+            description: Total VAT amount (in cents).
+            example: 2000
+          vat_exemption_reason:
+            type: string
+            description: If the customer is exempt from paying VAT, this attribute will return the reason why.
+            enum: [not_subject_to_vat, reverse_charge, eu_reverse_charge, intracommunity_acquisition, export_outside_eu] ## enum values changed to be understandable and matching the UI. for current values -- vat_code_0 = not_subject_to_vat ; vat_code_ae = reverse_charge ; vat_code_ue = eu_reverse_charge ; vat_code_e = intracommunity_acquisition ; vat_code_g = export_outside_eu
+            readOnly: true
+          vat_paid: 
+            type: string
+            description: Indicates when the VAT is paid - `receipts` meaning it is paid on receipts, `debits` meaning it is compensated for sales.
+            enum: [receipts, debits]
 
 
     ErrorMessage:

@@ -1,19 +1,19 @@
 openapi: 3.0.0
 info:
-  title: Bank Accounts
+  title: Users
   version: "1.0"
 servers: 
 - url: https://api.regate.io/v1
 security:
   - bearerAuth: []
 paths:
-  /bank_accounts:
+  /users:
     get:
-      summary: Retrieve all bank accounts.
-      description: Retrieve a list of bank accounts linked to this holding. Every customer needs a bank account linked to it - it will be used to receive the funds for sales invoices linked to this customer.
-      operationId: getBankAccounts
+      summary: Retrieve all users
+      description: Retrieve a list of users. Only users associated with the holding of the user making the request will be displayed.
+      operationId: getUsers
       tags:
-        - Bank Accounts
+        - Users
       parameters:
         - name: filter
           in: query
@@ -54,7 +54,43 @@ paths:
                   links:
                     $ref: "#/components/schemas/Links"
                   data:
-                    $ref: "#/components/schemas/OutputBankAccounts"
+                    type: array
+                    items: 
+                      $ref: "#/components/schemas/OutputUser"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+    post:
+      tags:
+      - Users
+      summary: Create a new user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InputUser'
+      responses:
+        201:
+          description: User succesfully created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  links:
+                    $ref: "#/components/schemas/Links"
+                  data:  
+                    $ref: "#/components/schemas/OutputUser"
+        400:
+          description: Bad request. API request was not correctly formatted.
+          $ref: "#/components/responses/BadRequest"
         401:
           description: Unauthorized request. Token is missing or is invalid.
           $ref: "#/components/responses/Unauthorized"
@@ -65,16 +101,16 @@ paths:
           description: Server error, please try again later.
           $ref: "#/components/responses/ServerError"
 
-  /bank_accounts/{bank_account_id}:
+  /users/{user_id}:
     get:
-      summary: Retrieve a specific bank account
-      operationId: getBankAccount
+      summary: Retrieve a specific user.
+      operationId: getUser
       tags:
-        - Bank Accounts
+        - Users
       parameters:
-        - name: bank_account_id
+        - name: user_id
           in: path
-          description: Unique UUID of the bank account you want to retrieve.
+          description: Unique UUID of the user you want to retrieve.
           required: true
           schema:
             type: string
@@ -86,8 +122,10 @@ paths:
               schema:
                 type: object
                 properties:
+                  links:
+                    $ref: "#/components/schemas/Links"
                   data:  
-                    $ref: "#/components/schemas/OutputBankAccounts"
+                    $ref: "#/components/schemas/OutputUser"
         401:
           description: Unauthorized request. Token is missing or is invalid.
           $ref: "#/components/responses/Unauthorized"
@@ -162,26 +200,94 @@ components:
           type: string
           description: The URL for the last page of results.
 
-    OutputBankAccounts:
+    InputUser:
+      type: object
+      required:
+      - first_name
+      - last_name
+      - email
+      - default_manager_id
+      - user_role_id
+      properties:
+        first_name:
+          type: string
+          description: User's first name.
+          example: John
+        last_name:
+          type: string
+          description: User's last name.
+          example: Doe
+        email:
+          type: string
+          description: User's company email.
+          example: email@example.com
+        default_manager_id:
+          type: string
+          description: Unique UUID of the user who will act as the default manager of the newly created user.
+          example: abcd1234-e5f6-7gh8-ij90-12d3k4l5mn67
+        user_roles:
+          type: array
+          description: An array containing the role IDs assigned to this user. To retrieve the list of roles, make a `GET` request to `/user_roles`.
+          items:
+            type: string
+            description: The ID of the role assigned to this user. 
+            example: 1abc2d3e-fg45-6789-0hi1-2j345klmno6p
+
+    
+    OutputUser:
       type: array
-      description: An array of objects containing the attributes for the retrieved bank accounts.
+      description: An array of objects containing the attributes for the retrieved users.
       items:
         properties:
-          bank_name:
+          created_at:
             type: string
-            description: Name of the bank.
-            example: BNP PARIBAS PUBLIC SECTOR SCF
-          bic:
+            format: date-time
+            description: Timestamp when the user was created in Regate.
+            example: 2023-01-31T23:59:59.000Z
+          created_by:
             type: string
-            description: Bank Identification Code (BIC).
-            example: BNPAFRPS
-          iban:
-            type: string
-            description: International Bank Account Number (IBAN).
-            example: 
+            description: Unique UUID of the user that created this particular user.
+            example: 123456ab-78cd-ef90-1gh2-345678ijklmn
           id:
             type: string
-            description: Unique UUID for this bank account.
+            description: Unique UUID for this user.
+            example: 1a234567-89b0-123c-45d6-e78fg90h1234
+          first_name:
+            type: string
+            description: User's first name.
+            example: John
+          last_name:
+            type: string
+            description: User's last name.
+            example: Doe
+          email:
+            type: string
+            description: User's company email.
+            example: email@example.com
+          default_manager_id:
+            type: string
+            description: Unique UUID of the user who will act as the default manager of the newly created user.
+            example: abcd1234-e5f6-7gh8-ij90-12d3k4l5mn67
+          user_roles:
+            type: array
+            description: An array of objects describing the roles assigned to this user. To retrieve the list of available roles, make a `GET` request to `/user_roles`.
+            items:
+              type: object
+              properties:
+                id:
+                  type: string 
+                  description: The ID of the role assigned to this user. 
+                  example: 1abc2d3e-fg45-6789-0hi1-2j345klmno6p
+                name:
+                  type: string
+                  description: The name of the role assigned to this user.
+                  example: Certified accountant
+          state:
+            type: string
+            description: Indicates the current status of the user. Those can be <br> `invited` - The user was created and an invite has been sent to his email address, but it has not yet been accepted. <br> `accepted` - The user has accepted the email invite and can now access Regate. <br> `removed` - The user was archived and can no longer access Regate.
+            example: invited
+            enum: [invited, accepted, removed]
+          
 
     ErrorMessage:
       properties:

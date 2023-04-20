@@ -54,9 +54,7 @@ paths:
                   links:
                     $ref: "#/components/schemas/Links"
                   data:
-                    type: array
-                    items: 
-                      $ref: "#/components/schemas/OutputProduct"
+                    $ref: "#/components/schemas/OutputProduct"
         401:
           description: Unauthorized request. Token is missing or is invalid.
           $ref: "#/components/responses/Unauthorized"
