@@ -40,3 +40,8 @@ jobs:
         uses: readmeio/rdme@v8
         with:
           rdme: openapi doc/public_api_v1/reference/products.yaml --key=${{ secrets.README_API_KEY }} --id=641c52cf2f703c004de01b94
+
+      - name: Run `openapi` command 🚀
+        uses: readmeio/rdme@v8
+        with:
+          rdme: openapi doc/public_api_v1/reference/users.yaml --key=${{ secrets.README_API_KEY }} --id=6440e84e2013b1000b0af6fb
