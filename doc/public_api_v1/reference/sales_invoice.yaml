@@ -204,7 +204,7 @@ components:
       - currency
       - invoice_due_date
       - payment_method
-      - transaction_lines_attributes
+      - lines
       - vat_paid
       description: An object containing the attributes for a sales invoice.
       properties:
@@ -308,7 +308,7 @@ components:
           type: string
           description: Subject line text of the invoice.
           example: My new invoice!
-        transaction_lines_attributes:
+        lines:
           type: array
           description: An array of objects, each describing a transaction line within the invoice.
           required:
@@ -610,7 +610,7 @@ components:
         # transaction_header_vat:
         #   type: string
         #   description: Text used as the header of the "VAT" column for the invoice transaction lines.
-          transaction_lines_attributes:
+          lines:
             type: array
             description: An array of objects, each describing a transaction line within the invoice.
             items:
