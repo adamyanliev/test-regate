@@ -71,7 +71,7 @@ paths:
     post:
       tags:
       - Sales Invoice
-      summary: Create a new sales sales invoice.
+      summary: Create a new sales invoice.
       requestBody:
         required: true
         content:

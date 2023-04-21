@@ -134,6 +134,99 @@ paths:
           description: Server error, please try again later.
           $ref: "#/components/responses/ServerError"
 
+  /user_roles:
+    get:
+      summary: Retrieve all user roles.
+      description: Retrieve a list of all roles that can be assigned to a user.
+      operationId: getUserRoles
+      tags:
+        - Users
+      parameters:
+        - name: filter
+          in: query
+          description: An object that defines the filters to use to retrieve only the items you require. Each field you add will be an additional filter to apply to the request. The filter key needs to be an attribute name (e.g. `label`), followed by an underscore and an operator name (e.g. `eq` for "equals"). For example, if you want to see all items with label `my_label`, the proper syntax will be `?filter[label_eq]=my_label`.
+          
+            For detailed information, please see the [Filtering section](../docs/filtering) in our Guides.
+          required: false
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+          style: deepObject
+          explode: true
+          allowReserved: true
+        - name: page
+          in: query
+          description: Results are paginated. Set the value to the page you want to retieve.
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: Results are paginated. This parameter indicates how many results per page will be returned.
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 1000
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  links:
+                    $ref: "#/components/schemas/Links"
+                  data:
+                    $ref: "#/components/schemas/OutputUserRoles"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+  /user_roles/{role_id}:
+    get:
+      summary: Retrieve a specific user role.
+      operationId: getUserRole
+      tags:
+        - Users
+      parameters:
+        - name: role_id
+          in: path
+          description: Unique UUID of the user role you want to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  links:
+                    $ref: "#/components/schemas/Links"
+                  data:  
+                    $ref: "#/components/schemas/OutputUserRoles"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
 
 components:
 
@@ -265,6 +358,8 @@ components:
           default_manager_id:
             type: string
             description: Unique UUID of the user who will act as the default manager of the newly created user.
+
+              **NOTE:** Only users with the following roles can be selected as default managers - `CEA`, `CCP`, `CECP`, `ANF`, `SCO`, `CEC-simple`.
             example: abcd1234-e5f6-7gh8-ij90-12d3k4l5mn67
           user_roles:
             type: array
@@ -274,7 +369,7 @@ components:
               properties:
                 id:
                   type: string 
-                  description: The ID of the role assigned to this user. 
+                  description: Unique UUID of the role assigned to this user. 
                   example: 1abc2d3e-fg45-6789-0hi1-2j345klmno6p
                 name:
                   type: string
@@ -282,10 +377,27 @@ components:
                   example: Certified accountant
           state:
             type: string
-            description: Indicates the current status of the user. Those can be <br> `invited` - The user was created and an invite has been sent to his email address, but it has not yet been accepted. <br> `accepted` - The user has accepted the email invite and can now access Regate. <br> `removed` - The user was archived and can no longer access Regate.
+            description: Indicates the current status of the user. <br> `invited` - The user was created and an invite has been sent to his email address, but it has not yet been accepted. <br> `accepted` - The user has accepted the email invite and can now access Regate. <br> `removed` - The user was archived and can no longer access Regate.
             example: invited
             enum: [invited, accepted, removed]
-          
+
+    OutputUserRoles:
+      type: array
+      description: An array of objects describing the available user roles.
+      items:
+        properties:
+          code:
+            type: string
+            description: User role code used internally in Regate.
+            example: CEX
+          id: 
+            type: string
+            description: Unique UUID of the user role.
+            example: 1abc2d3e-fg45-6789-0hi1-2j345klmno6p
+          name:
+            type: string
+            description: Name of the user role.
+            example: Certified accountant
 
     ErrorMessage:
       properties:
