@@ -310,7 +310,7 @@ components:
           example: My new invoice!
         lines:
           type: array
-          description: An array of objects, each describing a transaction line within the invoice.
+          description: An array of objects, each describing a line within the invoice.
           required:
           - product_id
           - quantity
@@ -612,7 +612,7 @@ components:
         #   description: Text used as the header of the "VAT" column for the invoice transaction lines.
           lines:
             type: array
-            description: An array of objects, each describing a transaction line within the invoice.
+            description: An array of objects, each describing a line within the invoice.
             items:
               properties:
                 product_id:
@@ -628,7 +628,7 @@ components:
               #   type: string
                 title:
                   type: string
-                  description: The name of the product on this transaction line.
+                  description: The name of the product on this line.
                   example: My product
                 total_price_cents:
                   type: integer
@@ -638,13 +638,13 @@ components:
               #   type: string
                 unit_price_cents: 
                   type: number
-                  description: The price for a single product described in this transaction line (in cents). Divide by 100 to receive the proper amount in the specified currency.
+                  description: The price for a single product described in this line (in cents). Divide by 100 to receive the proper amount in the specified currency.
                   example: 8000
               # unit_price_currency: 
               #   type: string
           transaction_taxes:
             type: array
-            description: An array of objects describing the VAT tax to be paid for each transaction line.
+            description: An array of objects describing the VAT tax to be paid for each line.
             items:
               properties:
                 amount_cents:
