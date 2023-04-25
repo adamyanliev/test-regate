@@ -536,7 +536,7 @@ components:
           ## recorded_at:
           ## recorded_by:
           ## recorded_by_id:
-          recurrence_attributes:
+          recurrence:
             type: object
             description: This object describes the configuration for a recurring invoice (or invoice draft) generation. 
             properties:
