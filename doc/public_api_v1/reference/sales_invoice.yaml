@@ -278,7 +278,7 @@ components:
           type: string
           description: Free text field used to record the purchase order ID.
           example: 11111111
-        recurrence_attributes:
+        recurrence:
           type: object
           description: This object describes the configuration for a recurring invoice (or invoice draft) generation. 
           properties:
