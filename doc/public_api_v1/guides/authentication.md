@@ -30,7 +30,7 @@ Once created, **the token value will be visible only once.** For security purpos
 
 The user role permissions selected for the token regulate what type of API calls can be made using it. For example, permissions may allow users to only retrieve sales invoices, but not create new ones. In case an API request is authenticated with a token without permissions for that specific call, a `403 - Forbidden` error code will be returned.
 
-(## probably will need a list of available API actions, dependent on role permissions##)
+(## probably will need a list of available API actions, dependent on role permission##)
 
 # Manage your tokens
 
