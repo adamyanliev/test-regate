@@ -22,7 +22,7 @@ When creating a token, the user selects the following attributes:
 
 The bearer tokens do not have a validity period and do not expire. A user is able to create multiple tokens.
 
-## Token Visibility
+## Token visibility
 
 Once created, **the token value will be visible only once.** For security purposes, the token value is not stored on Regate's end. Please make sure to copy its value before proceeding further.
 
