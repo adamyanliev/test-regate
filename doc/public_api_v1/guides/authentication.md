@@ -9,7 +9,7 @@ slug: authenticate
 
 The Regate API uses Bearer tokens to authenticate requests. The tokens are generated and managed in the Regate app under [Settings > Connect Regate to your tools > Public API > Generate a token](link).
 
-> Info
+> 📘 Info
 >
 > Only Regate users with specific permissions (## more details needed ##) are able to access this section of the Regate app and create / manage Bearer tokens.
 
@@ -43,6 +43,6 @@ You can see the active tokens for your holding by going to [Settings > Connect R
 
 Tokens can also be revoked from this section.
 
-> Warning
+> 🚧 Warning
 >
 > Once revoked, a token cannot be reinstated.
