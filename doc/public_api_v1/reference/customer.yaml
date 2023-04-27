@@ -242,7 +242,7 @@ components:
             properties:
               id:
                 type: string
-                description: ID of the bank account linked to this customer.  Make a GET request to /bank_accounts to retrieve the full list of available bank accounts.
+                description: ID of the bank account linked to this customer.  Make a `GET` request to `/bank_accounts` to retrieve the full list of available bank accounts.
                 example: 123e4567-e89b-12d3-a456-426614174000
         company_nb:
           type: string
