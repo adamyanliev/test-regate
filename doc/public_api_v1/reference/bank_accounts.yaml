@@ -15,19 +15,6 @@ paths:
       tags:
         - Bank Accounts
       parameters:
-        - name: filter
-          in: query
-          description: An object that defines the filters to use to retrieve only the items you require. Each field you add will be an additional filter to apply to the request. The filter key needs to be an attribute name (e.g. `label`), followed by an underscore and an operator name (e.g. `eq` for "equals"). For example, if you want to see all items with label `my_label`, the proper syntax will be `?filter[label_eq]=my_label`.
-          
-            For detailed information, please see the [Filtering section](../docs/filtering) in our Guides.
-          required: false
-          schema:
-            type: object
-            additionalProperties:
-              type: string
-          style: deepObject
-          explode: true
-          allowReserved: true
         - name: page
           in: query
           description: Results are paginated. Set the value to the page you want to retieve.
