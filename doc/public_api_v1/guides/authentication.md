@@ -1,5 +1,5 @@
 ---
-title: Authenticate
+title: Authentication
 excerpt: How to authenticate while using the Regate API
 category: 64510dd40228561019a31111
 slug: authentication
