@@ -84,7 +84,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OutputInvoice"
+                data:
+                  $ref: "#/components/schemas/OutputInvoice"
         400:
           description: Bad request. API request was not correctly formatted.
           $ref: "#/components/responses/BadRequest"
@@ -116,7 +117,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OutputInvoice"
+                data:
+                  $ref: "#/components/schemas/OutputInvoice"
         400:
           description: Bad request. API request was not correctly formatted.
           $ref: "#/components/responses/BadRequest"
@@ -341,20 +343,10 @@ components:
         type: object
         description: An object containing the attributes for a sales invoice.
         properties:
-          ## accountant_archived_at:
-          ##   type: integer
           already_paid:
             type: boolean
             description: Indicates whether the invoice has already been paid or not.
             example: false
-          ## approved_at
-          ## archived_at
-          ## archived_from
-          ## archived_from_at
-          ## attachments_jpg
-          ## bank_account_id
-          ## bank_accounts
-          ## can_be_validated
           comments:
             type: array
             description: An array of objects, each of which describes a comment left on this invoice.
@@ -451,10 +443,6 @@ components:
             type: string
             description: The footer text on the invoice.
             example: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        # from_credit_card:
-        #   type: boolean
-        #   description: Indicates whether or not the payment should come from a credit card.
-        #   readOnly: true
           invoice_date:
             type: string
             format: date
@@ -477,15 +465,6 @@ components:
             type: integer
             description: Gross invoice amount (in cents).
             example: 10000
-        # gross_amount_currency:
-        #   type: string
-        #   description: Gross amount currency.
-          ## has_comments:
-          ## has_mailing:
-          ## holding: ### unnecessary
-          ## journal_entry:
-            ## type: object
-            ## properties:
           net_amount_cents:
             type: integer
             description: Net invoice amount (in cents).
@@ -507,10 +486,6 @@ components:
             type: integer
             description: The already paid deposit amount (in cents) at the time of the invoice generation. Divide by 100 to receive the correct amount in the selected currency.
             default: 0
-        # payment_in_progress_at:
-        #   type: string
-        #   format: date-time
-        #   description: Timestamp when the invoice payment has been initiated.
           payment_method:
             type: string
             description: Payment method used to pay the invoice.
@@ -530,12 +505,6 @@ components:
             type: string
             description: Free text field used to record the purchase order ID.
             example: 11111111
-          ## purchase_request:
-          ## received_at:
-          ## reconciled_at:
-          ## recorded_at:
-          ## recorded_by:
-          ## recorded_by_id:
           recurrence:
             type: object
             description: This object describes the configuration for a recurring invoice (or invoice draft) generation. 
@@ -553,10 +522,6 @@ components:
                 type: string
                 description: End date for the recurring actions.
                 example: 2023-01-31
-            # currency:  ## irrelevant, new overall `currency` attribute to be used instead
-            #   type: string
-            # id: ## not needed
-            #   type: string
               recurrence_interval: ## renamed from `recurrence_unit` to make it clearer
                 type: string
                 description: Indicates the interval of time, after which the recurrence action will trigger. Can be `monthly`, `trimestrial` or `annual`.
@@ -565,51 +530,14 @@ components:
                 type: integer
                 description: The day of the month, on which the recurring action will take place.
                 example: 1
-            # document_template_id: ## remove this
-            #   type: string
-        # reference:
-        #   type: integer
-        #   format: int32
-        #   description: Unclear what this is and if it's needed
-          ## refusal_reasons:
-          ## refused_at:
-          ## refused_by_firstname:
-          ## refused_by_id:
-          ## refused_by_lastname:
-          ## sent_at:
           state:
             type: string
             description: Invoice state. ## Need to add additional info on possible states
             enum: [draft, created, received, recorded, excluded, paid, reconciled]
-          ## submitted_at:
-          ## submitted_by_id:
           subject_text:  ## renamed from object_text
             type: string
             description: Subject line text of the invoice.
             example: My new invoice!
-        # supplier_id:
-        #   type: string
-        #   description: Probably not needed as this is a sales invoice
-        # third_part_name:
-        #   type: string
-        #   description: The name of the customer that supplied this invoice.
-          ## timeline_events:
-          ## transaction_discounts:
-        # transaction_header_net_total_price:
-        #   type: string
-        #   description: Text used as the header of the "net total price" column for the invoice transaction lines.
-        # transaction_header_net_unit_price:
-        #   type: string
-        #   description: Text used as the header of the "net unit price" column for the invoice transaction lines.
-        # transaction_header_product:
-        #   type: string
-        #   description: Text used as the header of the "product" column for the invoice transaction lines.
-        # transaction_header_quantity:
-        #   type: string
-        #   description: Text used as the header of the "quantity" column for the invoice transaction lines.
-        # transaction_header_vat:
-        #   type: string
-        #   description: Text used as the header of the "VAT" column for the invoice transaction lines.
           lines:
             type: array
             description: An array of objects, each describing a line within the invoice.
@@ -624,8 +552,6 @@ components:
                   format: double
                   description: Indicates the amount of items in cents. Divide by 100 to receive the proper amount.
                   example: 1
-              # tax_financial_account_id:
-              #   type: string
                 title:
                   type: string
                   description: The name of the product on this line.
@@ -634,14 +560,10 @@ components:
                   type: integer
                   description: The total price for the products in this line in cents. Divide by 100 to receive the proper amount in the specified currency.
                   example: 8000
-              # total_price_currency:
-              #   type: string
                 unit_price_cents: 
                   type: number
                   description: The price for a single product described in this line (in cents). Divide by 100 to receive the proper amount in the specified currency.
                   example: 8000
-              # unit_price_currency: 
-              #   type: string
           transaction_taxes:
             type: array
             description: An array of objects describing the VAT tax to be paid for each line.

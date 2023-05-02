@@ -213,8 +213,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  links:
-                    $ref: "#/components/schemas/Links"
                   data:  
                     $ref: "#/components/schemas/OutputUserRoles"
         401:

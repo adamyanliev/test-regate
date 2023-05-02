@@ -120,8 +120,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  links:
-                    $ref: "#/components/schemas/Links"
                   data:  
                     $ref: "#/components/schemas/OutputProduct"
         401:
@@ -161,6 +159,9 @@ paths:
                 properties:
                   data:  
                     $ref: "#/components/schemas/OutputProduct"
+        304:
+          description: The specified object was not modified.
+          $ref: '#/components/responses/NotModified'
         401:
           description: Unauthorized request. Token is missing or is invalid.
           $ref: "#/components/responses/Unauthorized"
@@ -208,6 +209,12 @@ components:
             $ref: "#/components/schemas/ErrorMessage"
     ServerError:
       description: "Something wrong happened on our side, sorry for the inconvenience."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    NotModified:
+      description: "The object was not modified."
       content:
         application/json:
           schema:

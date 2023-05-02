@@ -165,10 +165,11 @@ components:
           iban:
             type: string
             description: International Bank Account Number (IBAN).
-            example: 
+            example: FR1234567890123456789012A34
           id:
             type: string
             description: Unique UUID for this bank account.
+            example: 12abc3de-4fg5-67hi-8jkl-9mn0o123p456
 
     ErrorMessage:
       properties:
