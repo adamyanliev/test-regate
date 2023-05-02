@@ -245,7 +245,6 @@ components:
       required:
       - description
       - price_cents
-      - price_currency
       - reference
       - title
       properties:
@@ -262,10 +261,6 @@ components:
           format: int64
           description: The price of this product, **exluding VAT tax**. The price is in cents, divide by 100 to retrieve the actual amount.
           example: 1000
-        price_currency:
-          type: string
-          description: The currency for this product's price.
-          example: EUR
         reference:
           type: string
           description: Product reference text.
@@ -291,10 +286,6 @@ components:
           format: int64
           description: The price of this product, **exluding VAT tax**. The price is in cents, divide by 100 to retrieve the actual amount.
           example: 1000
-        price_currency:
-          type: string
-          description: The currency for this product's price.
-          example: EUR
         reference:
           type: string
           description: Product reference text.
@@ -333,10 +324,6 @@ components:
             format: int64
             description: The price of this product, **exluding VAT tax**. The price is in cents, divide by 100 to retrieve the actual amount.
             example: 1000
-          price_currency:
-            type: string
-            description: The currency for this product's price.
-            example: EUR
           reference:
             type: string
             description: Product reference text.
