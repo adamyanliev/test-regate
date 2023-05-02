@@ -82,8 +82,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  links:
-                    $ref: "#/components/schemas/Links"
                   data:  
                     $ref: "#/components/schemas/OutputUser"
         400:
@@ -120,8 +118,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  links:
-                    $ref: "#/components/schemas/Links"
                   data:  
                     $ref: "#/components/schemas/OutputUser"
         401:

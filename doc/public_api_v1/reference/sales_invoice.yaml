@@ -84,8 +84,10 @@ paths:
           content:
             application/json:
               schema:
-                data:
-                  $ref: "#/components/schemas/OutputInvoice"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/OutputInvoice"
         400:
           description: Bad request. API request was not correctly formatted.
           $ref: "#/components/responses/BadRequest"
@@ -117,8 +119,10 @@ paths:
           content:
             application/json:
               schema:
-                data:
-                  $ref: "#/components/schemas/OutputInvoice"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/OutputInvoice"
         400:
           description: Bad request. API request was not correctly formatted.
           $ref: "#/components/responses/BadRequest"
