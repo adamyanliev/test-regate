@@ -19,7 +19,7 @@ jobs:
       - name: Update Customer endpoints 🚀
         uses: readmeio/rdme@v8
         with:
-          rdme: openapi doc/public_api_v1/reference/sales_invoice.yaml --key=${{ secrets.README_API_KEY }} --id=63ea43a574b0a000123fb6cc
+          rdme: openapi doc/public_api_v1/reference/customer.yaml --key=${{ secrets.README_API_KEY }} --id=63ea43be2264fb0044674b01
           
       - name: Update Invoice endpoints 🚀
         uses: readmeio/rdme@v8
@@ -41,7 +41,7 @@ jobs:
         with:
           rdme: openapi doc/public_api_v1/reference/products.yaml --key=${{ secrets.README_API_KEY }} --id=641c52cf2f703c004de01b94
 
-      - name: Run `openapi` command 🚀
+      - name: Update Users endpoints 🚀
         uses: readmeio/rdme@v8
         with:
           rdme: openapi doc/public_api_v1/reference/users.yaml --key=${{ secrets.README_API_KEY }} --id=6440e84e2013b1000b0af6fb
