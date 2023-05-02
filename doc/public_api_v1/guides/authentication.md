@@ -1,7 +1,7 @@
 ---
-title: Authentication
+title: Authenticate
 excerpt: How to authenticate while using the Regate API
-category: 63ea43a574b0a000123fb6cd
+category: 64510dd40228561019a31111
 slug: authentication
 ---
 

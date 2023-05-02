@@ -1,7 +1,7 @@
 ---
 title: Status codes and errors
 excerpt: Possible status code responses when using the Regate API
-category: 63ea43a574b0a000123fb6cd
+category: 64510dd40228561019a31111
 slug: status-codes-and-errors
 ---
 
