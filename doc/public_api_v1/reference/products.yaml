@@ -133,6 +133,43 @@ paths:
         500:
           description: Server error, please try again later.
           $ref: "#/components/responses/ServerError"
+    patch:
+      summary: Update a specific product
+      operationId: patchProduct
+      tags:
+        - Products
+      parameters:
+        - name: product_id
+          in: path
+          description: Unique UUID of the product you want to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProduct'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:  
+                    $ref: "#/components/schemas/OutputProduct"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
 
 
 components:
@@ -233,6 +270,34 @@ components:
           description: Indicates the VAT tax account applied to this product for customers. To retrieve the available VAT accounts, make a GET request to /sales_vat_accounts.
           example: 123abc45-678d-9e01-23f4-5g678901hi23
         
+    UpdateProduct:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Free text for the product description.
+          example: A toothbrush is an oral hygiene tool used to clean the teeth, gums, and tongue. It consists of a head of tightly clustered bristles, atop of which toothpaste can be applied, mounted on a handle which facilitates the cleaning of hard-to-reach areas of the mouth.
+        name:
+          type: string
+          description: Product name. This is the name that appears when you search for the product in the Regate UI.
+          example: toothbrush
+        price_cents:
+          type: integer
+          format: int64
+          description: The price of this product, **exluding VAT tax**. The price is in cents, divide by 100 to retrieve the actual amount.
+          example: 1000
+        price_currency:
+          type: string
+          description: The currency for this product's price.
+          example: EUR
+        reference:
+          type: string
+          description: Product reference text.
+          example: Item 123456789
+        sales_vat_account_id:
+          type: string
+          description: Indicates the VAT tax account applied to this product for customers. To retrieve the available VAT accounts, make a GET request to /sales_vat_accounts.
+          example: 123abc45-678d-9e01-23f4-5g678901hi23
         
 
     
