@@ -175,7 +175,7 @@ components:
             format: date-time
             description: Timestamp indicating when this sales VAT account was created in the Regate app.
             example: 2023-01-31T23:59:59.000Z
-          vat_account_id:
+          sales_vat_account_id:
             type: string
             description: Unique UUID for this sales VAT account.
             example: 123abc45-678d-9e01-23f4-5g678901hi23
