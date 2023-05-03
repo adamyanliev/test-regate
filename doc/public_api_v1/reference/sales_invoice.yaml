@@ -416,10 +416,45 @@ components:
             type: string
             description: Invoice currency (ISO 4217).
             default: EUR
-          customer_id:
-            type: string
-            description: Unique UUID of the customer, linked to this invoice.
-            example: 9876543a-bc21-0def-98g7-6543hij21kl0
+          customer:
+            type: object
+            description: An object containing the attributes of the customer linked to this invoice
+            properties:
+              id:
+                type: string
+                description: Unique UUID of the customer, linked to this invoice.
+                example: 9876543a-bc21-0def-98g7-6543hij21kl0
+              name:
+                type: string
+                description: Customer name.
+                example: Regate
+              bank_accounts:
+                type: array
+                description: An array of objects describing the bank accounts linked to this customer. The bank accounts will be displayed in sales invoices for this customer and will be used to receive funds for these sales invoices.
+                  
+                  NOTE - Only bank accounts that can be used for settlement of sales invoices can be linked to a customer. The list of such accounts can be seen in the Regate app under "Settings" >> "Customize Regate" >> "Account receivable settings".
+                items:
+                  properties:
+                    bank_name:
+                      type: string
+                      description: Name of the bank, where this bank account resides.
+                      example: BNP PARIBAS PUBLIC SECTOR SCF
+                    bic:
+                      type: string
+                      description: BIC for this bank account.
+                      example: BNPAFRPS
+                    iban:
+                      type: string
+                      description: IBAN for this bank account.
+                      example: FR8414508000506472869146N07
+                    id:
+                      type: string
+                      description: Unique UUID for this bank account in Regate.
+                      example: 123e4567-e89b-12d3-a456-426614174000
+                    is_used_for_payment_link:
+                      type: boolean
+                      description: Indicates if this bank account is displayed by default as a payment link when sending your invoices by email. Only one of your bank accounts can be selected to be used as a payment link.
+              
           exchange_rate: ## As users don't need the information about the exchange rates for all currencies, we should provide only the exchange rate relating to this invoice currency. currency is indicated with the new `currency` property, here we should only list the rate.
             type: number
             description: Exchange rate information for this invoice. If the invoice currency is EUR, the exchange rate will be 1.0.

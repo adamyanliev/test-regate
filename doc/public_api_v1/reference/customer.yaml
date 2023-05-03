@@ -233,12 +233,14 @@ components:
               example: 75002
         bank_accounts:
           type: array
-          description: An array of objects describing the bank accounts linked to this customer. The bank accounts will be displayed in sales invoices for this customer will be used to receive funds for these sales invoices.
+          description: An array of objects describing the bank accounts linked to this customer. The bank accounts will be displayed in sales invoices for this customer and will be used to receive funds for these sales invoices.
+            
+            NOTE - Only bank accounts that can be used for settlement of sales invoices can be linked to a customer. The list of such accounts can be seen in the Regate app under "Settings" >> "Customize Regate" >> "Account receivable settings".
           items:
             properties:
               id:
                 type: string
-                description: ID of the bank account linked to this customer.  Make a `GET` request to `/bank_accounts` to retrieve the full list of available bank accounts.
+                description: ID of the bank account linked to this customer.  Make a `GET` request to `/bank_accounts` to retrieve the full list of available bank accounts. 
                 example: 123e4567-e89b-12d3-a456-426614174000
         company_number:
           type: string
@@ -328,7 +330,9 @@ components:
             example: 10000
           bank_accounts:
             type: array
-            description: An array containing information about the bank accounts linked to this customer. The bank accounts will be the same ones linked to the Regate holding.
+            description: An array of objects describing the bank accounts linked to this customer. The bank accounts will be displayed in sales invoices for this customer and will be used to receive funds for these sales invoices.
+              
+              NOTE - Only bank accounts that can be used for settlement of sales invoices can be linked to a customer. The list of such accounts can be seen in the Regate app under "Settings" >> "Customize Regate" >> "Account receivable settings".
             items:
               properties:
                 bank_name:
@@ -386,7 +390,7 @@ components:
           name:
             type: string
             description: Customer name.
-            example: Regate.
+            example: Regate
           payment_method:
             type: string
             description: Payment method selected for this customer in Regate.

@@ -10,7 +10,9 @@ paths:
   /bank_accounts:
     get:
       summary: Retrieve all bank accounts.
-      description: Retrieve a list of bank accounts linked to this holding. Every customer needs a bank account linked to it - it will be used to receive the funds for sales invoices linked to this customer.
+      description: Retrieve a list of bank accounts linked to this holding, which can be used for settlement of sales invoices. Every customer needs a bank account linked to it - it will be used to receive the funds for sales invoices linked to this customer.
+
+        The list of such accounts can be seen in the Regate app under "Settings" >> "Customize Regate" >> "Account receivable settings". 
       operationId: getBankAccounts
       tags:
         - Bank Accounts
@@ -55,6 +57,7 @@ paths:
   /bank_accounts/{bank_account_id}:
     get:
       summary: Retrieve a specific bank account
+      description: Retrieve a specific bank account that can be used for settlement of sales invoices. The list of such accounts can be seen in the Regate app under "Settings" >> "Customize Regate" >> "Account receivable settings".
       operationId: getBankAccount
       tags:
         - Bank Accounts
