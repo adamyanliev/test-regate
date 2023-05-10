@@ -54,7 +54,9 @@ paths:
                   links:
                     $ref: "#/components/schemas/Links"
                   data:
-                    $ref: "#/components/schemas/OutputCustomer"
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OutputCustomer"
         401:
           description: Unauthorized request. Token is missing or is invalid.
           $ref: "#/components/responses/Unauthorized"
@@ -283,137 +285,136 @@ components:
           default: null
     
     OutputCustomer:
-      type: array
-      description: An array of objects containing the attributes for the retrieved customers.
-      items:
-        properties:
-          address:
-            type: object
-            description: Address information for this customer.
+      type: object
+      description: An object containing the attributes of a customer.
+      properties:
+        address:
+          type: object
+          description: Address information for this customer.
+          properties:
+            address_line_1: ## renamed from address_1
+              type: string
+              description: Main customer address line.
+              example: 17 rue de la Banque              
+            address_line_2: ## renamed from address_2
+              type: string
+              description: Additional address details for this customer.
+              example: 2nd floor
+            city:
+              description: City address for this customer.
+              type: string
+              example: Paris
+            country_code:
+              type: string
+              description: Country code [ISO Alpha-2](https://www.iban.com/country-codes).
+              example: FR
+            country_name: 
+              type: string
+              description: Country name. 
+              example: France
+            postal_code: ## renamed from zipcode
+              type: string
+              description: ZIP / Postal code.
+              example: 75002
+        company_number:
+          type: string
+          description: Customer's company identifier number. Should match the unique identifier used by all public bodies and administrative organisms in their relations with the company. For example, should match the SIREN number for French companies.
+          example: 123456789
+        created_at: ## new attribute indicating customer creation date. useful for search
+          type: string
+          format: date-time
+          description: Timestamp indicating when the customer was created.
+        balance_cents:
+          type: integer
+          format: int32
+          description: Customer balance amount (including tax) in cents. Divide by 100 to retrieve the proper amount.
+          example: 10000
+        bank_accounts:
+          type: array
+          description: An array of objects describing the bank accounts linked to this customer. The bank accounts will be displayed in sales invoices for this customer and will be used to receive funds for these sales invoices.
+            
+            NOTE - Only bank accounts that can be used for settlement of sales invoices can be linked to a customer. The list of such accounts can be seen in the Regate app under "Settings" >> "Customize Regate" >> "Account receivable settings".
+          items:
             properties:
-              address_line_1: ## renamed from address_1
+              bank_name:
                 type: string
-                description: Main customer address line.
-                example: 17 rue de la Banque              
-              address_line_2: ## renamed from address_2
+                description: Name of the bank, where this bank account resides.
+                example: BNP PARIBAS PUBLIC SECTOR SCF
+              bic:
                 type: string
-                description: Additional address details for this customer.
-                example: 2nd floor
-              city:
-                description: City address for this customer.
+                description: BIC for this bank account.
+                example: BNPAFRPS
+              iban:
                 type: string
-                example: Paris
-              country_code:
+                description: IBAN for this bank account.
+                example: FR8414508000506472869146N07
+              id:
                 type: string
-                description: Country code [ISO Alpha-2](https://www.iban.com/country-codes).
-                example: FR
-              country_name: 
-                type: string
-                description: Country name. 
-                example: France
-              postal_code: ## renamed from zipcode
-                type: string
-                description: ZIP / Postal code.
-                example: 75002
-          company_number:
-            type: string
-            description: Customer's company identifier number. Should match the unique identifier used by all public bodies and administrative organisms in their relations with the company. For example, should match the SIREN number for French companies.
-            example: 123456789
-          created_at: ## new attribute indicating customer creation date. useful for search
-            type: string
-            format: date-time
-            description: Timestamp indicating when the customer was created.
-          balance_cents:
-            type: integer
-            format: int32
-            description: Customer balance amount (including tax) in cents. Divide by 100 to retrieve the proper amount.
-            example: 10000
-          bank_accounts:
-            type: array
-            description: An array of objects describing the bank accounts linked to this customer. The bank accounts will be displayed in sales invoices for this customer and will be used to receive funds for these sales invoices.
-              
-              NOTE - Only bank accounts that can be used for settlement of sales invoices can be linked to a customer. The list of such accounts can be seen in the Regate app under "Settings" >> "Customize Regate" >> "Account receivable settings".
-            items:
-              properties:
-                bank_name:
-                  type: string
-                  description: Name of the bank, where this bank account resides.
-                  example: BNP PARIBAS PUBLIC SECTOR SCF
-                bic:
-                  type: string
-                  description: BIC for this bank account.
-                  example: BNPAFRPS
-                iban:
-                  type: string
-                  description: IBAN for this bank account.
-                  example: FR8414508000506472869146N07
-                id:
-                  type: string
-                  description: Unique UUID for this bank account in Regate.
-                  example: 123e4567-e89b-12d3-a456-426614174000
-                is_used_for_payment_link:
-                  type: boolean
-                  description: Indicates if this bank account is displayed by default as a payment link when sending your invoices by email. Only one of your bank accounts can be selected to be used as a payment link.
-          customer_reference:
-            type: string
-            description: Customer reference. This is an identifier assigned to credit and debit transactions.
-            example: REGATE
-          customer_type: ## if this isn't used, we should remove it
-            type: string
-            description: Customer type. Can be `company` or `individual`.
-            enum: [company, individual]
-            default: company
-          discount_condition:
-            type: string
-            description: Text explaining discount conditions. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `discount_condition` for the holding of the user.
-            example: "No discount granted for early payment."
-          external_id:
-            type: string
-            description: External ID for this customer.
-            example: REGATE_1
-          id:
-            type: string
-            description: Unique customer UUID in Regate.
-            example: 9876543a-bc21-0def-98g7-6543hij21kl0 
-          is_archived:   ### new attribute
-            type: boolean
-            description: Indicates whether the customer is archived or not.
-            example: false
-          late_payment_penalties:
-            type: string
-            description: Text explaining late payment penalties. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `late_payment_penalties` for the holding of the user.
-            example: "In the event of non-payment on the due date, penalties calculated at three times the legal interest rate will be applied."
-          legal_fixed_compensation: 
-            type: string
-            description: Text explaining legal fixed compensation. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `legal_fixed_compensation` for the holding of the user.
-            example: "Any late payment will result in a fixed compensation for recovery costs of €40."
-          name:
-            type: string
-            description: Customer name.
-            example: Regate
-          payment_method:
-            type: string
-            description: Payment method selected for this customer in Regate.
-            enum: [bank_transfer, bank_direct_debit, bill_of_exchange, credit_card, bank_check]
-          unit_number:
-            type: string
-            description: Unique identifier used to identify the head office or a specific secondary establishment of the customer's company. For example, for French companies this should match the SIRET number.
-            example: 12345678912345
-          vat_exemption_reason:
-            type: string
-            description: If the customer is exempt from paying VAT, this attribute will return the reason why.
-            enum: [not_subject_to_vat, reverse_charge, eu_reverse_charge, intracommunity_acquisition, export_outside_eu] ## enum values changed to be understandable and matching the UI. for current values -- vat_code_0 = not_subject_to_vat ; vat_code_ae = reverse_charge ; vat_code_ue = eu_reverse_charge ; vat_code_e = intracommunity_acquisition ; vat_code_g = export_outside_eu
-            default: null
-          vat_number:
-            type: string
-            description: VAT number for this customer.
-            example: FRXX999999999
-            default: null
-          yearly_billed_cents:
-            type: integer
-            format: int64
-            description: Yearly billed amount for this customer (in cents). Divide by 100 to get the proper amount.
-            example: 1500000
+                description: Unique UUID for this bank account in Regate.
+                example: 123e4567-e89b-12d3-a456-426614174000
+              is_used_for_payment_link:
+                type: boolean
+                description: Indicates if this bank account is displayed by default as a payment link when sending your invoices by email. Only one of your bank accounts can be selected to be used as a payment link.
+        customer_reference:
+          type: string
+          description: Customer reference. This is an identifier assigned to credit and debit transactions.
+          example: REGATE
+        customer_type: ## if this isn't used, we should remove it
+          type: string
+          description: Customer type. Can be `company` or `individual`.
+          enum: [company, individual]
+          default: company
+        discount_condition:
+          type: string
+          description: Text explaining discount conditions. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `discount_condition` for the holding of the user.
+          example: "No discount granted for early payment."
+        external_id:
+          type: string
+          description: External ID for this customer.
+          example: REGATE_1
+        id:
+          type: string
+          description: Unique customer UUID in Regate.
+          example: 9876543a-bc21-0def-98g7-6543hij21kl0 
+        is_archived:   ### new attribute
+          type: boolean
+          description: Indicates whether the customer is archived or not.
+          example: false
+        late_payment_penalties:
+          type: string
+          description: Text explaining late payment penalties. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `late_payment_penalties` for the holding of the user.
+          example: "In the event of non-payment on the due date, penalties calculated at three times the legal interest rate will be applied."
+        legal_fixed_compensation: 
+          type: string
+          description: Text explaining legal fixed compensation. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `legal_fixed_compensation` for the holding of the user.
+          example: "Any late payment will result in a fixed compensation for recovery costs of €40."
+        name:
+          type: string
+          description: Customer name.
+          example: Regate
+        payment_method:
+          type: string
+          description: Payment method selected for this customer in Regate.
+          enum: [bank_transfer, bank_direct_debit, bill_of_exchange, credit_card, bank_check]
+        unit_number:
+          type: string
+          description: Unique identifier used to identify the head office or a specific secondary establishment of the customer's company. For example, for French companies this should match the SIRET number.
+          example: 12345678912345
+        vat_exemption_reason:
+          type: string
+          description: If the customer is exempt from paying VAT, this attribute will return the reason why.
+          enum: [not_subject_to_vat, reverse_charge, eu_reverse_charge, intracommunity_acquisition, export_outside_eu] ## enum values changed to be understandable and matching the UI. for current values -- vat_code_0 = not_subject_to_vat ; vat_code_ae = reverse_charge ; vat_code_ue = eu_reverse_charge ; vat_code_e = intracommunity_acquisition ; vat_code_g = export_outside_eu
+          default: null
+        vat_number:
+          type: string
+          description: VAT number for this customer.
+          example: FRXX999999999
+          default: null
+        yearly_billed_cents:
+          type: integer
+          format: int64
+          description: Yearly billed amount for this customer (in cents). Divide by 100 to get the proper amount.
+          example: 1500000
 
 
     ErrorMessage:

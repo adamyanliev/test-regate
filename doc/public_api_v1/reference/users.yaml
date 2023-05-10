@@ -54,7 +54,9 @@ paths:
                   links:
                     $ref: "#/components/schemas/Links"
                   data:
-                    $ref: "#/components/schemas/OutputUser"
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OutputUser"
         401:
           description: Unauthorized request. Token is missing or is invalid.
           $ref: "#/components/responses/Unauthorized"
@@ -177,7 +179,9 @@ paths:
                   links:
                     $ref: "#/components/schemas/Links"
                   data:
-                    $ref: "#/components/schemas/OutputUserRoles"
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OutputUserRoles"
         401:
           description: Unauthorized request. Token is missing or is invalid.
           $ref: "#/components/responses/Unauthorized"
@@ -320,78 +324,76 @@ components:
 
     
     OutputUser:
-      type: array
-      description: An array of objects containing the attributes for the retrieved users.
-      items:
-        properties:
-          created_at:
-            type: string
-            format: date-time
-            description: Timestamp when the user was created in Regate.
-            example: 2023-01-31T23:59:59.000Z
-          created_by:
-            type: string
-            description: Unique UUID of the user that created this particular user.
-            example: 123456ab-78cd-ef90-1gh2-345678ijklmn
-          id:
-            type: string
-            description: Unique UUID for this user.
-            example: 1a234567-89b0-123c-45d6-e78fg90h1234
-          first_name:
-            type: string
-            description: User's first name.
-            example: John
-          last_name:
-            type: string
-            description: User's last name.
-            example: Doe
-          email:
-            type: string
-            description: User's company email.
-            example: email@example.com
-          default_manager_id:
-            type: string
-            description: Unique UUID of the user who will act as the default manager of the newly created user.
+      type: object
+      description: An object containing the attributes of a user.
+      properties:
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the user was created in Regate.
+          example: 2023-01-31T23:59:59.000Z
+        created_by:
+          type: string
+          description: Unique UUID of the user that created this particular user.
+          example: 123456ab-78cd-ef90-1gh2-345678ijklmn
+        id:
+          type: string
+          description: Unique UUID for this user.
+          example: 1a234567-89b0-123c-45d6-e78fg90h1234
+        first_name:
+          type: string
+          description: User's first name.
+          example: John
+        last_name:
+          type: string
+          description: User's last name.
+          example: Doe
+        email:
+          type: string
+          description: User's company email.
+          example: email@example.com
+        default_manager_id:
+          type: string
+          description: Unique UUID of the user who will act as the default manager of the newly created user.
 
-              **NOTE:** Only users with the following roles can be selected as default managers - `CEA`, `CCP`, `CECP`, `ANF`, `SCO`, `CEC-simple`.
-            example: abcd1234-e5f6-7gh8-ij90-12d3k4l5mn67
-          user_roles:
-            type: array
-            description: An array of objects describing the roles assigned to this user. To retrieve the list of available roles, make a `GET` request to `/user_roles`.
-            items:
-              type: object
-              properties:
-                id:
-                  type: string 
-                  description: Unique UUID of the role assigned to this user. 
-                  example: 1abc2d3e-fg45-6789-0hi1-2j345klmno6p
-                name:
-                  type: string
-                  description: The name of the role assigned to this user.
-                  example: Certified accountant
-          state:
-            type: string
-            description: Indicates the current status of the user. <br> `invited` - The user was created and an invite has been sent to his email address, but it has not yet been accepted. <br> `accepted` - The user has accepted the email invite and can now access Regate. <br> `removed` - The user was archived and can no longer access Regate.
-            example: invited
-            enum: [invited, accepted, removed]
+            **NOTE:** Only users with the following roles can be selected as default managers - `CEA`, `CCP`, `CECP`, `ANF`, `SCO`, `CEC-simple`.
+          example: abcd1234-e5f6-7gh8-ij90-12d3k4l5mn67
+        user_roles:
+          type: array
+          description: An array of objects describing the roles assigned to this user. To retrieve the list of available roles, make a `GET` request to `/user_roles`.
+          items:
+            type: object
+            properties:
+              id:
+                type: string 
+                description: Unique UUID of the role assigned to this user. 
+                example: 1abc2d3e-fg45-6789-0hi1-2j345klmno6p
+              name:
+                type: string
+                description: The name of the role assigned to this user.
+                example: Certified accountant
+        state:
+          type: string
+          description: Indicates the current status of the user. <br> `invited` - The user was created and an invite has been sent to his email address, but it has not yet been accepted. <br> `accepted` - The user has accepted the email invite and can now access Regate. <br> `removed` - The user was archived and can no longer access Regate.
+          example: invited
+          enum: [invited, accepted, removed]
 
     OutputUserRoles:
-      type: array
-      description: An array of objects describing the available user roles.
-      items:
-        properties:
-          code:
-            type: string
-            description: User role code used internally in Regate.
-            example: CEX
-          id: 
-            type: string
-            description: Unique UUID of the user role.
-            example: 1abc2d3e-fg45-6789-0hi1-2j345klmno6p
-          name:
-            type: string
-            description: Name of the user role.
-            example: Certified accountant
+      type: object
+      description: An object containing the attributes of a user role.
+      properties:
+        code:
+          type: string
+          description: User role code used internally in Regate.
+          example: CEX
+        id: 
+          type: string
+          description: Unique UUID of the user role.
+          example: 1abc2d3e-fg45-6789-0hi1-2j345klmno6p
+        name:
+          type: string
+          description: Name of the user role.
+          example: Certified accountant
 
     ErrorMessage:
       properties:

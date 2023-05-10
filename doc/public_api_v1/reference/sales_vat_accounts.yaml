@@ -53,8 +53,10 @@ paths:
                 properties:
                   links:
                     $ref: "#/components/schemas/Links"
-                  data:  
-                    $ref: "#/components/schemas/OutputSalesVatAccounts"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OutputSalesVatAccounts"
         401:
           description: Unauthorized request. Token is missing or is invalid.
           $ref: "#/components/responses/Unauthorized"
@@ -86,7 +88,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data:  
+                  data:
                     $ref: "#/components/schemas/OutputSalesVatAccounts"
         401:
           description: Unauthorized request. Token is missing or is invalid.
@@ -166,27 +168,25 @@ components:
 
     
     OutputSalesVatAccounts:
-      type: array
-      description: An array of objects containing the attributes for the retrieved sales VAT accounts.
-      items:
-        properties:
-          created_at:
-            type: string
-            format: date-time
-            description: Timestamp indicating when this sales VAT account was created in the Regate app.
-            example: 2023-01-31T23:59:59.000Z
-          sales_vat_account_id:
-            type: string
-            description: Unique UUID for this sales VAT account.
-            example: 123abc45-678d-9e01-23f4-5g678901hi23
-          rate:
-            type: integer
-            description: VAT tax percentage rate.
-            example: 20
-          label:
-            type: string
-            description: The label selected in Regate for this sales VAT account. 
-            example: Standard VAT 20% (France)
+      description: An object containing the attributes of a sales VAT account.
+      properties:
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp indicating when this sales VAT account was created in the Regate app.
+          example: 2023-01-31T23:59:59.000Z
+        sales_vat_account_id:
+          type: string
+          description: Unique UUID for this sales VAT account.
+          example: 123abc45-678d-9e01-23f4-5g678901hi23
+        rate:
+          type: integer
+          description: VAT tax percentage rate.
+          example: 20
+        label:
+          type: string
+          description: The label selected in Regate for this sales VAT account. 
+          example: Standard VAT 20% (France)
 
     ErrorMessage:
       properties:

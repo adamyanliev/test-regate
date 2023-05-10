@@ -54,7 +54,9 @@ paths:
                   links:
                     $ref: "#/components/schemas/Links"
                   data:
-                    $ref: "#/components/schemas/OutputProduct"
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OutputProduct"
         401:
           description: Unauthorized request. Token is missing or is invalid.
           $ref: "#/components/responses/Unauthorized"
@@ -298,40 +300,39 @@ components:
 
     
     OutputProduct:
-      type: array
-      description: An array of objects containing the attributes for the retrieved products.
-      items:
-        properties:
-          created_at:
-            type: string
-            format: date
-            description: Timestamp when the product was created in Regate.
-            example: 2023-01-31
-          description: 
-            type: string
-            description: Free text for the product description.
-            example: A toothbrush is an oral hygiene tool used to clean the teeth, gums, and tongue. It consists of a head of tightly clustered bristles, atop of which toothpaste can be applied, mounted on a handle which facilitates the cleaning of hard-to-reach areas of the mouth.
-          id:
-            type: string
-            description: Unique UUID for this product.
-            example: 1a234567-89b0-123c-45d6-e78fg90h1234
-          name:
-            type: string
-            description: Product name. This is the name that appears when you search for the product in the Regate UI.
-            example: toothbrush
-          price_cents:
-            type: integer
-            format: int64
-            description: The price of this product, **exluding VAT tax**. The price is in cents, divide by 100 to retrieve the actual amount.
-            example: 1000
-          reference:
-            type: string
-            description: Product reference text.
-            example: Item 123456789
-          vat_account_id:
-            type: string
-            description: Indicates the VAT tax account applied to this product for customers. To retrieve the available VAT accounts, make a GET request to /vat_accounts.
-            example: 123abc45-678d-9e01-23f4-5g678901hi23
+      type: object
+      description: An object containing the attributes of a product.
+      properties:
+        created_at:
+          type: string
+          format: date
+          description: Timestamp when the product was created in Regate.
+          example: 2023-01-31
+        description: 
+          type: string
+          description: Free text for the product description.
+          example: A toothbrush is an oral hygiene tool used to clean the teeth, gums, and tongue. It consists of a head of tightly clustered bristles, atop of which toothpaste can be applied, mounted on a handle which facilitates the cleaning of hard-to-reach areas of the mouth.
+        id:
+          type: string
+          description: Unique UUID for this product.
+          example: 1a234567-89b0-123c-45d6-e78fg90h1234
+        name:
+          type: string
+          description: Product name. This is the name that appears when you search for the product in the Regate UI.
+          example: toothbrush
+        price_cents:
+          type: integer
+          format: int64
+          description: The price of this product, **exluding VAT tax**. The price is in cents, divide by 100 to retrieve the actual amount.
+          example: 1000
+        reference:
+          type: string
+          description: Product reference text.
+          example: Item 123456789
+        vat_account_id:
+          type: string
+          description: Indicates the VAT tax account applied to this product for customers. To retrieve the available VAT accounts, make a GET request to /vat_accounts.
+          example: 123abc45-678d-9e01-23f4-5g678901hi23
 
     ErrorMessage:
       properties:

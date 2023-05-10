@@ -43,7 +43,9 @@ paths:
                   links:
                     $ref: "#/components/schemas/Links"
                   data:
-                    $ref: "#/components/schemas/OutputBankAccounts"
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OutputBankAccounts"
         401:
           description: Unauthorized request. Token is missing or is invalid.
           $ref: "#/components/responses/Unauthorized"
@@ -153,26 +155,25 @@ components:
           description: The URL for the last page of results.
 
     OutputBankAccounts:
-      type: array
-      description: An array of objects containing the attributes for the retrieved bank accounts.
-      items:
-        properties:
-          bank_name:
-            type: string
-            description: Name of the bank.
-            example: BNP PARIBAS PUBLIC SECTOR SCF
-          bic:
-            type: string
-            description: Bank Identification Code (BIC).
-            example: BNPAFRPS
-          iban:
-            type: string
-            description: International Bank Account Number (IBAN).
-            example: FR1234567890123456789012A34
-          id:
-            type: string
-            description: Unique UUID for this bank account.
-            example: 12abc3de-4fg5-67hi-8jkl-9mn0o123p456
+      type: object
+      description: An object containing the attributes of a bank account.
+      properties:
+        bank_name:
+          type: string
+          description: Name of the bank.
+          example: BNP PARIBAS PUBLIC SECTOR SCF
+        bic:
+          type: string
+          description: Bank Identification Code (BIC).
+          example: BNPAFRPS
+        iban:
+          type: string
+          description: International Bank Account Number (IBAN).
+          example: FR1234567890123456789012A34
+        id:
+          type: string
+          description: Unique UUID for this bank account.
+          example: 12abc3de-4fg5-67hi-8jkl-9mn0o123p456
 
     ErrorMessage:
       properties:
