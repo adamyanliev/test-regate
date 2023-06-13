@@ -3,7 +3,7 @@ info:
   title: Sales VAT accounts
   version: "1.0"
 servers: 
-- url: https://api.regate.io/v1
+- url: https://app.regate.io/public_api/v1
 security:
   - bearerAuth: []
 paths:
@@ -53,7 +53,7 @@ paths:
                 properties:
                   links:
                     $ref: "#/components/schemas/Links"
-                  data:
+                  sales_vat_accounts:
                     type: array
                     items:
                       $ref: "#/components/schemas/OutputSalesVatAccounts"
@@ -88,7 +88,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data:
+                  sales_vat_accounts:
                     $ref: "#/components/schemas/OutputSalesVatAccounts"
         401:
           description: Unauthorized request. Token is missing or is invalid.
@@ -175,7 +175,7 @@ components:
           format: date-time
           description: Timestamp indicating when this sales VAT account was created in the Regate app.
           example: 2023-01-31T23:59:59.000Z
-        sales_vat_account_id:
+        id:
           type: string
           description: Unique UUID for this sales VAT account.
           example: 123abc45-678d-9e01-23f4-5g678901hi23

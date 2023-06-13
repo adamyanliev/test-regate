@@ -3,7 +3,7 @@ info:
   title: Bank Accounts
   version: "1.0"
 servers: 
-- url: https://api.regate.io/v1
+- url: https://app.regate.io/public_api/v1
 security:
   - bearerAuth: []
 paths:
@@ -42,7 +42,7 @@ paths:
                 properties:
                   links:
                     $ref: "#/components/schemas/Links"
-                  data:
+                  bank_accounts:
                     type: array
                     items:
                       $ref: "#/components/schemas/OutputBankAccounts"
@@ -78,7 +78,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data:  
+                  bank_accounts:  
                     $ref: "#/components/schemas/OutputBankAccounts"
         401:
           description: Unauthorized request. Token is missing or is invalid.

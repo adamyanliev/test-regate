@@ -3,7 +3,7 @@ info:
   title: Sales invoices
   version: "1.0"
 servers: 
-- url: https://api.regate.io/v1
+- url: https://app.regate.io/public_api/v1
 security:
   - bearerAuth: []
 paths:
@@ -53,7 +53,7 @@ paths:
                 properties:
                   links:
                     $ref: "#/components/schemas/Links"
-                  data:
+                  sales_invoices:
                     type: array
                     items:
                       $ref: "#/components/schemas/OutputInvoice"
@@ -88,7 +88,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data:
+                  sales_invoices:
                     $ref: "#/components/schemas/OutputInvoice"
         400:
           description: Bad request. API request was not correctly formatted.
@@ -123,7 +123,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data:
+                  sales_invoices:
                     $ref: "#/components/schemas/OutputInvoice"
         400:
           description: Bad request. API request was not correctly formatted.
@@ -265,6 +265,11 @@ components:
           description: Invoice number. If no value is provided, the invoice number will be automatically generated, based on the Accounts receivable numbering logic set up in the Regate app (under Settings > Accounting > General information).
           
             **Mandatory, if either `file` or `file_url` values are not empty!**
+        type:
+          type: string
+          description: Type of sales invoice - can be a standard sales invoice or a credit note.
+          example: 
+          enum: [sales_invoice, credit_note] 
         other_information:
           type: string
           description: Free text for additional information relating to this invoice.
@@ -617,6 +622,11 @@ components:
                 type: integer
                 description: VAT tax percentage rate.
                 example: 25
+        type:
+          type: string
+          description: Type of sales invoice - can be a standard sales invoice or a credit note.
+          example: 
+          enum: [sales_invoice, credit_note] 
         urgent:
           type: boolean
           description: Indicates whether the invoice is flagged as urgent or not.

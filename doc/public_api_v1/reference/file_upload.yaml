@@ -1,9 +1,11 @@
+## This spec is not implemented, keepin it as a draft for future developments on a specific "file upload" endpoint
+
 openapi: 3.0.0
 info:
   title: File upload
   version: "1.0"
 servers: 
-- url: https://api.regate.io/v1
+- url: https://app.regate.io/public_api/v1
 security:
   - bearerAuth: []
 paths:

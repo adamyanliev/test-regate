@@ -3,7 +3,7 @@ info:
   title: Users
   version: "1.0"
 servers: 
-- url: https://api.regate.io/v1
+- url: https://app.regate.io/public_api/v1
 security:
   - bearerAuth: []
 paths:
@@ -15,6 +15,12 @@ paths:
       tags:
         - Users
       parameters:
+        - name: managers
+          in: query
+          description: When true, will only retrieve users, which can be assigned as default managers to other users. When false, only those users that cannot be assigned as default managers will be returned.
+          required: false
+          schema:
+            type: boolean
         - name: filter
           in: query
           description: An object that defines the filters to use to retrieve only the items you require. Each field you add will be an additional filter to apply to the request. The filter key needs to be an attribute name (e.g. `label`), followed by an underscore and an operator name (e.g. `eq` for "equals"). For example, if you want to see all items with label `my_label`, the proper syntax will be `?filter[label_eq]=my_label`.
@@ -53,7 +59,7 @@ paths:
                 properties:
                   links:
                     $ref: "#/components/schemas/Links"
-                  data:
+                  users:
                     type: array
                     items:
                       $ref: "#/components/schemas/OutputUser"
@@ -84,7 +90,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data:  
+                  users:  
                     $ref: "#/components/schemas/OutputUser"
         400:
           description: Bad request. API request was not correctly formatted.
@@ -120,8 +126,47 @@ paths:
               schema:
                 type: object
                 properties:
-                  data:  
+                  users:  
                     $ref: "#/components/schemas/OutputUser"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+    patch:
+      tags:
+      - Users
+      summary: Update an existing user.
+      parameters:
+      - name: user_id
+        in: path
+        description: Unique UUID of the user you want to retrieve.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+      responses:
+        200:
+          description: User succesfully updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:  
+                    $ref: "#/components/schemas/OutputUser"
+        400:
+          description: Bad request. API request was not correctly formatted.
+          $ref: "#/components/responses/BadRequest"
         401:
           description: Unauthorized request. Token is missing or is invalid.
           $ref: "#/components/responses/Unauthorized"
@@ -178,7 +223,7 @@ paths:
                 properties:
                   links:
                     $ref: "#/components/schemas/Links"
-                  data:
+                  user_roles:
                     type: array
                     items:
                       $ref: "#/components/schemas/OutputUserRoles"
@@ -213,7 +258,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data:  
+                  user_roles:  
                     $ref: "#/components/schemas/OutputUserRoles"
         401:
           description: Unauthorized request. Token is missing or is invalid.
@@ -296,7 +341,7 @@ components:
       - last_name
       - email
       - default_manager_id
-      - user_role_id
+      - user_roles
       properties:
         first_name:
           type: string
@@ -321,12 +366,115 @@ components:
             type: string
             description: The ID of the role assigned to this user. 
             example: 1abc2d3e-fg45-6789-0hi1-2j345klmno6p
+        bank_account:
+          type: object
+          description: An object describing the bank account linked to this user. The bank account will be used for reimbursements related to expenses made by this user. 
+          required:
+          - bic
+          - iban
+          properties:
+            bank_name:
+              type: string
+              description: Name of the bank, associated with the BIC.
+              example: BNP-PARIBAS SA
+            bic:
+              type: string
+              description: Bank Identification Code (BIC).
 
+                **NOTE** - Mandatory, if IBAN is provided in the request body.
+              example: BNPAFRPS
+            currency:
+              type: string
+              description: Bank account currency (ISO 4217).
+              default: EUR
+            iban:
+              type: string
+              description: International Bank Account Number (IBAN).
+
+                **NOTE** - If the IBAN is provided in the request body, then it is mandatory to provide the BIC code as well.
+              example: FR1234567890123456789012A34            
+
+    UpdateUser:
+      type: object
+      properties:
+        first_name:
+          type: string
+          description: User's first name.
+          example: John
+        last_name:
+          type: string
+          description: User's last name.
+          example: Doe
+        email:
+          type: string
+          description: User's company email.
+          example: email@example.com
+        default_manager_id:
+          type: string
+          description: Unique UUID of the user who will act as the default manager of the newly created user.
+          example: abcd1234-e5f6-7gh8-ij90-12d3k4l5mn67
+        user_roles:
+          type: array
+          description: An array containing the role IDs assigned to this user. To retrieve the list of roles, make a `GET` request to `/user_roles`.
+          items:
+            type: string
+            description: The ID of the role assigned to this user. 
+            example: 1abc2d3e-fg45-6789-0hi1-2j345klmno6p
+        bank_account:
+          type: object
+          description: An object describing the bank account linked to this user. The bank account will be used for reimbursements related to expenses made by this user. 
+          required:
+          - bic
+          - iban
+          properties:
+            bank_name:
+              type: string
+              description: Name of the bank, associated with the BIC.
+              example: BNP-PARIBAS SA
+            bic:
+              type: string
+              description: Bank Identification Code (BIC).
+
+                **NOTE** - Mandatory, when IBAN is provided in the request body.
+              example: BNPAFRPS
+            currency:
+              type: string
+              description: Bank account currency (ISO 4217).
+              default: EUR
+            iban:
+              type: string
+              description: International Bank Account Number (IBAN).
+                **NOTE** - If the IBAN is provided in the request body, then it is mandatory to provide the BIC code as well.
+              example: FR1234567890123456789012A34
     
     OutputUser:
       type: object
       description: An object containing the attributes of a user.
       properties:
+        bank_account:
+          type: object
+          description: An object describing the bank account linked to this user. The bank account will be used for reimbursements related to expenses made by this user. 
+          properties:
+            bank_name:
+              type: string
+              description: Name of the bank, associated with the BIC.
+              example: BNP-PARIBAS SA
+            bic:
+              type: string
+              description: Bank Identification Code (BIC).
+              example: BNPAFRPS
+            currency:
+              type: string
+              description: Bank account currency (ISO 4217).
+              example: EUR
+            iban:
+              type: string
+              description: International Bank Account Number (IBAN).
+              example: FR1234567890123456789012A34
+            id:
+              type: string
+              description: Unique UUID for this bank account.
+              example: 12345abc-67de-8901-fg23-h45i67j89012
         created_at:
           type: string
           format: date-time
@@ -354,9 +502,9 @@ components:
           example: email@example.com
         default_manager_id:
           type: string
-          description: Unique UUID of the user who will act as the default manager of the newly created user.
+          description: Unique UUID of the user who will act as the default manager of the newly created user. The default manager user needs to be assigned a user role that permits this.
 
-            **NOTE:** Only users with the following roles can be selected as default managers - `CEA`, `CCP`, `CECP`, `ANF`, `SCO`, `CEC-simple`.
+            **NOTE:** To understand which roles allow for a user to be assigned as a default manager, Make a `GET /user_roles` request and look at the value of the `manager` attribute for the respective roles.
           example: abcd1234-e5f6-7gh8-ij90-12d3k4l5mn67
         user_roles:
           type: array
@@ -372,6 +520,10 @@ components:
                 type: string
                 description: The name of the role assigned to this user.
                 example: Certified accountant
+              manager:
+                type: boolean
+                description: Indicates whether this role allows a user to be assigned as a default manager of a different user.
+                example: false
         state:
           type: string
           description: Indicates the current status of the user. <br> `invited` - The user was created and an invite has been sent to his email address, but it has not yet been accepted. <br> `accepted` - The user has accepted the email invite and can now access Regate. <br> `removed` - The user was archived and can no longer access Regate.
@@ -394,6 +546,10 @@ components:
           type: string
           description: Name of the user role.
           example: Certified accountant
+        manager:
+          type: boolean
+          description: Indicates whether this role allows a user to be assigned as a default manager of a different user.
+          example: false
 
     ErrorMessage:
       properties:

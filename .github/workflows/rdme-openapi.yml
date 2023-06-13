@@ -19,29 +19,29 @@ jobs:
       - name: Update Customer endpoints 🚀
         uses: readmeio/rdme@v8
         with:
-          rdme: openapi doc/public_api_v1/reference/customer.yaml --key=${{ secrets.README_API_KEY }} --id=63ea43be2264fb0044674b01
+          rdme: openapi doc/public_api_v1/reference/customer.yaml --key=${{ secrets.README_API_KEY }} --id=648847e5f83dc300238467fb
           
       - name: Update Invoice endpoints 🚀
         uses: readmeio/rdme@v8
         with:
-          rdme: openapi doc/public_api_v1/reference/sales_invoice.yaml --key=${{ secrets.README_API_KEY }} --id=63ea43a574b0a000123fb6cc
+          rdme: openapi doc/public_api_v1/reference/sales_invoice.yaml --key=${{ secrets.README_API_KEY }} --id=64884874534af40050d88414
 
       - name: Update Bank account endpoints 🚀
         uses: readmeio/rdme@v8
         with:
-          rdme: openapi doc/public_api_v1/reference/bank_accounts.yaml --key=${{ secrets.README_API_KEY }} --id=641c5273a4a8a900346ae15f
+          rdme: openapi doc/public_api_v1/reference/bank_accounts.yaml --key=${{ secrets.README_API_KEY }} --id=64884821edb75c003d42dcb4
 
       - name: Update Sales VAT accounts endpoints 🚀
         uses: readmeio/rdme@v8
         with:
-          rdme: openapi doc/public_api_v1/reference/sales_vat_accounts.yaml --key=${{ secrets.README_API_KEY }} --id=641c52b0e9087200266a821f
+          rdme: openapi doc/public_api_v1/reference/sales_vat_accounts.yaml --key=${{ secrets.README_API_KEY }} --id=6488488ca571bf0018e827a3
 
       - name: Update Products endpoints 🚀
         uses: readmeio/rdme@v8
         with:
-          rdme: openapi doc/public_api_v1/reference/products.yaml --key=${{ secrets.README_API_KEY }} --id=641c52cf2f703c004de01b94
+          rdme: openapi doc/public_api_v1/reference/products.yaml --key=${{ secrets.README_API_KEY }} --id=6488485c917642005918edde
 
       - name: Update Users endpoints 🚀
         uses: readmeio/rdme@v8
         with:
-          rdme: openapi doc/public_api_v1/reference/users.yaml --key=${{ secrets.README_API_KEY }} --id=6440e84e2013b1000b0af6fb
+          rdme: openapi doc/public_api_v1/reference/users.yaml --key=${{ secrets.README_API_KEY }} --id=648848a0dbbc8e003d720ef8
