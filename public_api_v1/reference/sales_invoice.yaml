@@ -1,0 +1,715 @@
+openapi: 3.0.0
+info:
+  title: Sales invoices
+  version: "1.0"
+servers: 
+- url: https://api.regate.io/v1
+security:
+  - bearerAuth: []
+paths:
+  /sales_invoices:
+    get:
+      tags:
+      - Sales Invoice
+      summary: Retrieve all sales invoices
+      description: Retrieve a list of sales invoices, specified by the selected filter parameters.
+      operationId: getInvoice
+      parameters:
+        - name: filter
+          in: query
+          description: An object that defines the filters to use to retrieve only the items you require. Each field you add will be an additional filter to apply to the request. The filter key needs to be an attribute name (e.g. `label`), followed by an underscore and an operator name (e.g. `eq` for "equals"). For example, if you want to see all tokens with label `my_label`, the proper syntax will be `?filter[label_eq]=my_label`.
+          
+            For detailed information, please see the [Filtering section](../docs/filtering) in our Guides.
+          required: false
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+          style: deepObject
+          explode: true
+          allowReserved: true
+        - name: page
+          in: query
+          description: Results are paginated. Set the value to the page you want to retieve.
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: Results are paginated. This parameter indicates how many results per page will be returned.
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 1000
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  links:
+                    $ref: "#/components/schemas/Links"
+                  sales_invoices:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OutputInvoice"
+        400:
+          description: Bad request. API request was not correctly formatted.
+          $ref: "#/components/responses/BadRequest"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+    post:
+      tags:
+      - Sales Invoice
+      summary: Create a new sales invoice.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InputInvoice'
+      responses:
+        201:
+          description: sales invoice succesfully created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sales_invoice:
+                    $ref: "#/components/schemas/OutputInvoice"
+        400:
+          description: Bad request. API request was not correctly formatted.
+          $ref: "#/components/responses/BadRequest"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+  /sales_invoices/{invoice_id}:
+    get:
+      tags:
+      - Sales Invoice
+      summary: Retrieve a single sales invoice.
+      parameters:
+      - name: invoice_id
+        in: path
+        required: true
+        description: Unique ID assigned to this invoice.
+        schema:
+          type: string
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sales_invoice:
+                    $ref: "#/components/schemas/OutputInvoice"
+        400:
+          description: Bad request. API request was not correctly formatted.
+          $ref: "#/components/responses/BadRequest"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        404:
+          description: Not found.
+          $ref: "#/components/responses/NotFound"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+  responses:
+    BadRequest:
+      description: "Bad input. See ErrorMessage for more information."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    Unauthorized:
+      description: "Your API credentials are not valid. Please review them."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    Forbidden:
+      description: "You don't have permission to access this URL."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    NotFound:
+      description: "URL does not exist."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    ServerError:
+      description: "Something wrong happened on our side, sorry for the inconvenience."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+
+  schemas:
+    Links:
+      type: object
+      description: An object containing links to the URL for the current API call, as well as URL for the first, previous, next and last page of results, if the retrieved objects are too many to be displayed on a single page.
+      properties:
+        self:
+          type: string
+          description: The URL for the current page of results.
+        first:
+          type: string
+          description: The URL for the first page of results.
+        prev:
+          type: string
+          description: The URL for the previous page of results.
+        next:
+          type: string
+          description: The URL for the next page of results.
+        last:
+          type: string
+          description: The URL for the last page of results.
+
+    InputInvoice:
+      type: object
+      required:
+      - customer_id
+      - currency
+      - due_date
+      - payment_method
+      - lines
+      - vat_paid
+      description: An object containing the attributes for a sales invoice.
+      properties:
+        currency: 
+          type: string
+          description: Invoice currency (ISO 4217).
+          default: EUR
+        customer_id:
+          type: string
+          description: Unique UUID of the customer, linked to this invoice.
+          example: 9876543a-bc21-0def-98g7-6543hij21kl0
+        file_url:
+          type: string
+          description: The URL for a PDF copy of the invoice you want attached to the invoice object. Only public links can be used to retrieve a file using the `file_url` attribute.
+          
+            **NOTE** - If `file` or `file_url` is not empty, setting a value for `invoice_number` is mandatory!
+          example: https://www.example/com/my_invoice.pdf
+        file:
+          type: object
+          description: An object describing a PDF copy of the invoice, encoded in base64 format. This will override the `file_url` value, if both are provided.
+          
+            **NOTE** - If `file` or `file_url` is not empty, setting a value for `invoice_number` is mandatory!
+          properties:
+            filename:
+              type: string
+              description: The name of the file (without the format extension).
+              example: my_invoice
+            content_type:
+              type: string
+              description: Defines file format using a MIME type. At the moment only PDF is supported. See the official [MIME type list](https://www.iana.org/assignments/media-types/media-types.xhtml) for additional information.
+              enum: [application/pdf]
+            base64:
+              type: string
+              description: Base64 encoded content of invoice file.
+        footer_text:
+          type: string
+          description: The footer text on the invoice.
+        delivery_date:
+          type: string
+          format: date
+          description: The date, on which the invoice was delivered.
+          example: 2023-01-31
+        due_date:
+          type: string
+          format: date
+          description: The date, on which the invoice is due.
+          example: 2023-01-31
+        invoice_number:
+          type: string
+          description: Invoice number. If no value is provided, the invoice number will be automatically generated, based on the Accounts receivable numbering logic set up in the Regate app (under Settings > Accounting > General information).
+          
+            **Mandatory, if either `file` or `file_url` values are not empty!**
+        type:
+          type: string
+          description: Type of sales invoice - can be a standard sales invoice or a credit note.
+          example: 
+          enum: [sales_invoice, credit_note] 
+        other_information:
+          type: string
+          description: Free text for additional information relating to this invoice.
+        paid_amount_cents: ## renamed from deposit_cents
+          type: integer
+          description: The already paid amount at the time of the invoice generation.
+        payment_method:
+          type: string
+          description: Payment method used to pay the invoice.
+          enum: [bank_transfer, bank_direct_debit, bill_of_exchange, credit_card, bank_check]
+        payment_method_other:
+          type: string
+          description: Description for a payment method used, if it's not in the listed ones available for `payment_method`.
+        payment_reference:
+          type: string
+          description: External payment reference.
+          example: ABC_1234567890
+        purchase_order_text:
+          type: string
+          description: Free text field used to record the purchase order ID.
+          example: 11111111
+        recurrence:
+          type: object
+          description: This object describes the configuration for a recurring invoice (or invoice draft) generation. 
+          properties:
+            action:
+              type: string
+              description: Indicates what action will be taken when the next recurrence interval starts. Can be to generate a new sales invoice or to generate an invoice draft.
+              enum: [generate_invoice, generate_draft]
+            active_from:
+              type: string
+              format: date
+              description: Start date for the recurring actions.
+              example: 2023-01-31
+            active_to:
+              type: string
+              format: date
+              description: End date for the recurring actions.
+              example: 2023-01-31
+            recurrence_interval: ## renamed from `recurrence_unit` to make it clearer
+              type: string
+              description: Indicates the interval of time, after which the recurrence action will trigger. Can be `monthly`, `trimestrial` or `annual`.
+              enum: [monthly, trimestrial, annual]
+            recurrence_day: ## renamed from `recurrence_value` to make it clearer
+              type: integer
+              description: The date of the month, on which the recurring action will take place.
+              example: 1
+        subject_text:  ## renamed from object_text
+          type: string
+          description: Subject line text of the invoice.
+          example: My new invoice!
+        lines:
+          type: array
+          description: An array of objects, each describing a line within the invoice.
+          required:
+          - product_id
+          - quantity
+          items:
+            properties:
+              discount_type:
+                type: string
+                description: Type of discount applied to this line (if any). The discount can be a percentage one or fixed amount one.
+                enum: [percentage, fixed_amount]
+              discount_value:
+                type: integer
+                format: int32
+                description: The value of the discount applied to this line (if any). If the discount type is a percentage one, enter the percentage amount. If the discount type is a fixed amount, then enter the amount **in cents**.
+                example: 0
+              reference_id:
+                type: string
+                description: External reference ID for the product in this line.
+
+                  **NOTE** - Every product object has a defined reference ID in it. If you set a value for this attribute, it will overrite that value for this line in the invoice invoice, but will **not update the reference ID of the actual product object**.
+                example: ABC123                
+              product_id:
+                type: string
+                description: Unique UUID of the product in Regate for this line within the invoice. Make a `GET` request to `/products` to retrieve product information.
+                example: 1a234567-89b0-123c-45d6-e78fg90h1234
+              quantity: 
+                type: number
+                format: double
+                description: Indicates the amount of items in cents. Divide by 100 to receive the proper amount.
+                example: 1
+              unit_price_cents:
+                type: integer
+                format: int32
+                description: The price for one unit of this product, **exluding VAT tax and discount**. The price is in cents, divide by 100 to retrieve the actual amount.
+
+                  **NOTE** - Every product object has a defined price in it. If you set a value for this attribute, it will overrite that value for this line in the invoice, but will **not update the price of the actual product object**.
+                example: 1000
+              sales_vat_account_id:
+                type: string
+                description: Indicates the VAT tax account applied to this product for customers. To retrieve the available VAT accounts, make a GET request to /sales_vat_accounts.
+
+                  **NOTE** - Every product object has a VAT tax account associated to it. If you set a value for this attribute, it will overrite that value for this line in the invoice, but will **not update the VAT tax account of the actual product object**.
+                example: 123abc45-678d-9e01-23f4-5g678901hi23
+        urgent:
+          type: boolean
+          description: Indicates whether the invoice is flagged as urgent or not.
+          default: false
+        vat_paid: 
+          type: string
+          description: Indicates when the VAT is paid - `receipts` meaning it is paid on receipts, `debits` meaning it is compensated for sales.
+          enum: [receipts, debits]
+
+
+    OutputInvoice:
+      type: object
+      description: An object containing the attributes for a sales invoice.
+      properties:
+        already_paid:
+          type: boolean
+          description: Indicates whether the invoice has already been paid or not.
+          example: false
+        comments:
+          type: array
+          description: An array of objects, each of which describes a comment left on this invoice.
+          items:
+            properties:
+              content:
+                type: string
+                description: The content of the comment.
+                example: Needs review.
+              created_at:
+                type: string
+                format: date-time
+                description: Timestamp when the comment was added to the invoice.
+                example: 2023-01-31T23:59:59.000Z
+              id:
+                type: string
+                description: ID of the comment.
+                example: 12a34b5c-de67-8901-2f34-567gh8i901jk
+              updated_at:
+                type: string
+                format: date-time
+                description: Timestamp when the comment was last updated.
+                example: 2023-01-31T23:59:59.000Z
+              user:
+                type: object
+                description: An object describing the Regate user that left this comment.
+                properties:
+                  email:
+                    type: string
+                    format: email
+                    description: Email address for the user that left the comment.
+                    example: email@example.com
+                  firstname:
+                    type: string
+                    description: First name of the user that left the comment.
+                    example: John
+                  id:
+                    type: string
+                    description: ID of the user that left the comment.
+                    example: a1bc23b4-ef5g-6789-h01i-234j567k8lmn
+                  lastname:
+                    type: string
+                    description: Last name of the user that left the comment.
+                    example: Doe
+                  name:
+                    type: string
+                    description: Full name of the user that left the comment.
+                    example: John Doe
+                  phone_number:
+                    type: string
+                    description: Phone number of the user that left the comment.
+                    example: +331234567890
+                  role:
+                    type: string
+                    description: Role of the user that left the comment.
+                    example: CEO
+        created_at:
+          description: Timestamp when the invoice was created in Regate.
+          type: string
+          format: date-time
+          example: 2023-01-31T23:59:59.000Z
+        currency: ## new attribute. as currency is the same across attributes, this will be the currency that is valid for all amounts - already paid, VAT, product, total etc..
+          type: string
+          description: Invoice currency (ISO 4217).
+          default: EUR
+        customer:
+          type: object
+          description: An object containing the attributes of the customer linked to this invoice
+          properties:
+            id:
+              type: string
+              description: Unique UUID of the customer, linked to this invoice.
+              example: 9876543a-bc21-0def-98g7-6543hij21kl0
+            name:
+              type: string
+              description: Customer name.
+              example: Regate
+            bank_accounts:
+              type: array
+              description: An array of objects describing the bank accounts linked to this customer. The bank accounts will be displayed in sales invoices for this customer and will be used to receive funds for these sales invoices.
+                
+                NOTE - Only bank accounts that can be used for settlement of sales invoices can be linked to a customer. The list of such accounts can be seen in the Regate app under "Settings" >> "Customize Regate" >> "Account receivable settings".
+              items:
+                properties:
+                  bank_name:
+                    type: string
+                    description: Name of the bank, where this bank account resides.
+                    example: BNP PARIBAS PUBLIC SECTOR SCF
+                  bic:
+                    type: string
+                    description: BIC for this bank account.
+                    example: BNPAFRPS
+                  iban:
+                    type: string
+                    description: IBAN for this bank account.
+                    example: FR8414508000506472869146N07
+                  id:
+                    type: string
+                    description: Unique UUID for this bank account in Regate.
+                    example: 123e4567-e89b-12d3-a456-426614174000
+                  is_used_for_payment_link:
+                    type: boolean
+                    description: Indicates if this bank account is displayed by default as a payment link when sending your invoices by email. Only one of your bank accounts can be selected to be used as a payment link.
+            
+        exchange_rate: ## As users don't need the information about the exchange rates for all currencies, we should provide only the exchange rate relating to this invoice currency. currency is indicated with the new `currency` property, here we should only list the rate.
+          type: number
+          description: Exchange rate information for this invoice. If the invoice currency is EUR, the exchange rate will be 1.0.
+          example: 1.0
+          readOnly: true
+        file:
+          type: object
+          description: An object describing a PDF copy of the invoice. 
+          properties:
+            filename:
+              type: string
+              description: The name of the file (without the format extension).
+              example: my_invoice
+            content_type:
+              type: string
+              description: Defines file format using a MIME type. At the moment only PDF is supported. See the official [MIME type list](https://www.iana.org/assignments/media-types/media-types.xhtml) for additional information.
+              enum: [application/pdf]
+            url:
+              type: string
+              description: URL to download the invoice PDF copy.
+        footer_text:
+          type: string
+          description: The footer text on the invoice.
+          example: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        issue_date:
+          type: string
+          format: date
+          description: The date, on which the invoice was issued.
+          example: 2023-01-31
+        delivery_date:
+          type: string
+          format: date
+          description: The date, on which the invoice was delivered.
+          example: 2023-01-31
+        due_date:
+          type: string
+          format: date
+          description: The date, on which the invoice is due.
+          example: 2023-01-31
+        invoice_number:
+          type: string
+          description: Invoice number. By default, the invoice number is automatically generated, based on the Accounts receivable numbering logic set up in the Regate app (under Settings > Accounting > General information). However, it can be set manually during the POST request.
+        gross_amount_cents:
+          type: integer
+          description: Gross invoice amount (in cents).
+          example: 10000
+        net_amount_cents:
+          type: integer
+          description: Net invoice amount (in cents).
+          example: 8000
+        other_information:
+          type: string
+          description: Free text for additional information relating to this invoice.
+          example: Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+        paid_amount: 
+          type: integer
+          description: Amount that has been paid based on the invoice.
+          example: 0
+        paid_at: ## renamed from payed_at
+          type: string
+          format: date-time
+          description: Timestamp when the invoice has been paid.
+          example: 2023-01-31T23:59:59.000Z
+        paid_amount_cents: ## renamed from deposit_cents
+          type: integer
+          description: The already paid deposit amount (in cents) at the time of the invoice generation. Divide by 100 to receive the correct amount in the selected currency.
+          default: 0
+        payment_method:
+          type: string
+          description: Payment method used to pay the invoice.
+          enum: [bank_transfer, bank_direct_debit, bill_of_exchange, credit_card, bank_check]
+        payment_method_other:
+          type: string
+          description: Description for a payment method used, if it's not in the listed ones available for `payment_method`.
+        payment_reference: ## renamed from ref_payment
+          type: string
+          description: External payment reference.
+          example: ABC_1234567890
+        payment_terms_text:
+          type: string
+          description: Text explaining the payment terms for this invoice. The text is comprised from the values of `discount_condition`, `late_payment_penalties` and `legal_fixed_compensation` attributes of the customer linked to this invoice.
+          readOnly: true
+        purchase_order_text:
+          type: string
+          description: Free text field used to record the purchase order ID.
+          example: 11111111
+        recurrence:
+          type: object
+          description: This object describes the configuration for a recurring invoice (or invoice draft) generation. 
+          properties:
+            action:
+              type: string
+              description: Indicates what action will be taken when the next recurrence interval starts. Can be to generate a new sales invoice or to generate an invoice draft.
+              enum: [generate_invoice, generate_draft]
+            active_from:
+              type: string
+              format: date
+              description: Start date for the recurring actions.
+              example: 2023-01-31
+            active_to:
+              type: string
+              description: End date for the recurring actions.
+              example: 2023-01-31
+            recurrence_interval: ## renamed from `recurrence_unit` to make it clearer
+              type: string
+              description: Indicates the interval of time, after which the recurrence action will trigger. Can be `monthly`, `trimestrial` or `annual`.
+              enum: [monthly, trimestrial, annual] # renamed from month, trimestrial, year to make it grammatically correct and clear 
+            recurrence_day: ## renamed from `recurrence_value` to make it clearer
+              type: integer
+              description: The day of the month, on which the recurring action will take place.
+              example: 1
+        state:
+          type: string
+          description: Invoice state. ## Need to add additional info on possible states
+          enum: [draft, created, received, recorded, excluded, paid, reconciled]
+        subject_text:  ## renamed from object_text
+          type: string
+          description: Subject line text of the invoice.
+          example: My new invoice!
+        lines:
+          type: array
+          description: An array of objects, each describing a line within the invoice.
+          items:
+            properties:
+              discount_type:
+                type: string
+                description: Type of discount applied to this line (if any). The discount can be a percentage one or fixed amount one.
+                enum: [percentage, fixed_amount]
+              discount_value:
+                type: integer
+                format: int32
+                description: The value of the discount applied to this line (if any). If the discount type is a percentage one, the value indicates the percentage amount. If the discount type is a fixed amount, then value is **in cents** - divide by 100 to retrieve the actual amount.
+              reference_id:
+                type: string
+                description: External reference ID for the product in this line.
+                example: ABC123                
+              product_id:
+                type: string
+                description: Unique UUID of the product in Regate for this line within the invoice.
+                example: 1a234567-89b0-123c-45d6-e78fg90h1234
+              quantity: 
+                type: number
+                format: double
+                description: Indicates the amount of items in cents. Divide by 100 to receive the proper amount.
+                example: 1
+              title:
+                type: string
+                description: The name of the product on this line.
+                example: My product
+              total_price_cents:
+                type: integer
+                description: The total price for the products in this line in cents. Divide by 100 to receive the proper amount in the specified currency.
+                example: 8000
+              unit_price_cents: 
+                type: number
+                description: The price for a single product described in this line (in cents). Divide by 100 to receive the proper amount in the specified currency.
+                example: 8000
+              unit_price_cents:
+                type: integer
+                format: int32
+                description: The price for one unit of this product, **exluding VAT tax and discount**. The price is in cents, divide by 100 to retrieve the actual amount.
+                example: 1000
+              sales_vat_account_id:
+                type: string
+                description: Indicates the VAT tax account applied to this line. 
+                example: 123abc45-678d-9e01-23f4-5g678901hi23
+        taxes:
+          type: array
+          description: An array of objects describing the VAT tax to be paid for each line.
+          items:
+            properties:
+              amount_cents:
+                type: integer
+                format: int32
+                description: Net amount (in cents). Divide by 100 to retrieve the proper amount.
+                example: 8000
+              rate:
+                type: integer
+                description: VAT tax percentage rate.
+                example: 25
+        type:
+          type: string
+          description: Type of sales invoice - can be a standard sales invoice or a credit note.
+          example: 
+          enum: [sales_invoice, credit_note] 
+        urgent:
+          type: boolean
+          description: Indicates whether the invoice is flagged as urgent or not.
+          default: false
+        vat_amount_cents:
+          type: integer
+          format: int32
+          description: Total VAT amount (in cents).
+          example: 2000
+        vat_exemption_reason:
+          type: string
+          description: If the customer is exempt from paying VAT, this attribute will return the reason why.
+          enum: [not_subject_to_vat, reverse_charge, eu_reverse_charge, intracommunity_acquisition, export_outside_eu] ## enum values changed to be understandable and matching the UI. for current values -- vat_code_0 = not_subject_to_vat ; vat_code_ae = reverse_charge ; vat_code_ue = eu_reverse_charge ; vat_code_e = intracommunity_acquisition ; vat_code_g = export_outside_eu
+          readOnly: true
+        vat_paid: 
+          type: string
+          description: Indicates when the VAT is paid - `receipts` meaning it is paid on receipts, `debits` meaning it is compensated for sales.
+          enum: [receipts, debits]
+
+
+    ErrorMessage:
+      properties:
+        ErrorMessage:
+          description: Error message describing the error.
+          type: string
+        ErrorCode:
+          description: Error code of the error.
+          type: string
+        ErrorRelatedTo:
+          description: A list of properties to which the error relates.
+          type: array
+          items:
+            type: string
+        ErrorIdentifier:
+          description: Error identifier used for tracing.
+          type: string
+          format: uuid
+        StatusCode:
+          description: Status code for this request.
+          type: integer

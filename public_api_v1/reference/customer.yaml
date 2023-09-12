@@ -1,0 +1,564 @@
+openapi: 3.0.0
+info:
+  title: Customers
+  version: "1.0"
+servers: 
+- url: https://api.regate.io/v1
+security:
+  - bearerAuth: []
+paths:
+  /customers:
+    get:
+      summary: Retrieve all customers
+      description: Retrieve a list of customers, specified by the selected filter parameters.
+      operationId: getCustomers
+      tags:
+        - Customers
+      parameters:
+        - name: filter
+          in: query
+          description: An object that defines the filters to use to retrieve only the items you require. Each field you add will be an additional filter to apply to the request. The filter key needs to be an attribute name (e.g. `label`), followed by an underscore and an operator name (e.g. `eq` for "equals"). For example, if you want to see all tokens with label `my_label`, the proper syntax will be `?filter[label_eq]=my_label`.
+          
+            For detailed information, please see the [Filtering section](../docs/filtering) in our Guides.
+          required: false
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+          style: deepObject
+          explode: true
+          allowReserved: true
+        - name: page
+          in: query
+          description: Results are paginated. Set the value to the page you want to retieve.
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: Results are paginated. This parameter indicates how many results per page will be returned.
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 1000
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  links:
+                    $ref: "#/components/schemas/Links"
+                  customers:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OutputCustomer"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+    post:
+      tags:
+      - Customers
+      summary: Create a new customer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InputCustomer'
+      responses:
+        201:
+          description: Invoice succesfully created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customer:  
+                    $ref: "#/components/schemas/OutputCustomer"
+        400:
+          description: Bad request. API request was not correctly formatted.
+          $ref: "#/components/responses/BadRequest"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+  /customers/{customer_id}:
+    get:
+      summary: Retrieve a specific customer
+      operationId: getCustomer
+      tags:
+        - Customers
+      parameters:
+        - name: customer_id
+          in: path
+          description: Unique UUID of the customer you want to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customer:  
+                    $ref: "#/components/schemas/OutputCustomer"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+    patch:
+      summary: Update a specific customer
+      operationId: patchCustomer
+      tags:
+        - Customers
+      parameters:
+        - name: customer_id
+          in: path
+          description: Unique UUID of the customer you want to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomer'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customer:  
+                    $ref: "#/components/schemas/OutputCustomer"
+        304:
+          description: The specified object was not modified.
+          $ref: '#/components/responses/NotModified'
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+  responses:
+    BadRequest:
+      description: "Bad input. See ErrorMessage for more information."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    Unauthorized:
+      description: "Your API credentials are not valid. Please review them."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    Forbidden:
+      description: "You don't have permission to access this URL."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    NotFound:
+      description: "URL does not exist."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    ServerError:
+      description: "Something wrong happened on our side, sorry for the inconvenience."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    NotModified:
+      description: "The object was not modified."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+
+  schemas:
+    Links:
+      type: object
+      description: An object containing links to the URL for the current API call, as well as URL for the first, previous, next and last page of results, if the retrieved objects are too many to be displayed on a single page.
+      properties:
+        self:
+          type: string
+          description: The URL for the current page of results.
+        first:
+          type: string
+          description: The URL for the first page of results.
+        prev:
+          type: string
+          description: The URL for the previous page of results.
+        next:
+          type: string
+          description: The URL for the next page of results.
+        last:
+          type: string
+          description: The URL for the last page of results.
+
+    InputCustomer:
+      type: object
+      required:
+      - address
+      - bank_accounts
+      - name
+      - payment_method
+      properties:
+        address:
+          type: object
+          required:
+          - address_line_1
+          - country_code
+          - city
+          - postal_code
+          description: Address information for this customer.
+          properties:
+            address_line_1: ## renamed from address_1
+              type: string
+              description: Main customer address line.
+              example: 17 rue de la Banque              
+            address_line_2: ## renamed from address_2
+              type: string
+              description: Additional address details for this customer.
+              example: 2nd floor
+            city:
+              description: City address for this customer.
+              type: string
+              example: Paris
+            country_code: ## renamed from address.country.iso_alpha2
+              type: string
+              description: Country code [ISO Alpha-2](https://www.iban.com/country-codes).
+              example: FR
+            postal_code: ## renamed from zipcode
+              type: string
+              description: ZIP / Postal code.
+              example: 75002
+        bank_accounts:
+          type: array
+          description: An array of objects describing the bank accounts linked to this customer. The bank accounts will be displayed in sales invoices for this customer and will be used to receive funds for these sales invoices.
+            
+            NOTE - Only bank accounts that can be used for settlement of sales invoices can be linked to a customer. The list of such accounts can be seen in the Regate app under "Settings" >> "Customize Regate" >> "Account receivable settings".
+          items:
+            properties:
+              id:
+                type: string
+                description: ID of the bank account linked to this customer.  Make a `GET` request to `/bank_accounts` to retrieve the full list of available bank accounts. 
+                example: 123e4567-e89b-12d3-a456-426614174000
+        company_number:
+          type: string
+          description: Customer's company identifier number. Should match the unique identifier used by all public bodies and administrative organisms in their relations with the company. For example, should match the SIREN number for French companies.
+          example: 123456789
+        customer_reference:
+          type: string
+          description: Customer reference. This is an identifier assigned to credit and debit transactions.
+          example: REGATE
+        customer_type: 
+          type: string
+          description: Customer type. Can be `company` or `individual`.
+          enum: [company, individual]
+          default: company
+        external_id:
+          type: string
+          description: External ID for this customer.
+          example: REGATE_1
+        name:
+          type: string
+          description: Customer name.
+          example: Regate.
+        payment_method:
+          type: string
+          description: Payment method selected for this customer in Regate.
+          enum: [bank_transfer, bank_direct_debit, bill_of_exchange, credit_card, bank_check]
+        unit_number:
+          type: string
+          description: Unique identifier used to identify the head office or a specific secondary establishment of the customer's company. For example, for French companies this should match the SIRET number.
+          example: 12345678912345
+        vat_exemption_reason:
+          type: string
+          description: If the customer is exempt from paying VAT, this attribute will return the reason why.
+          enum: [not_subject_to_vat, reverse_charge, eu_reverse_charge, intracommunity_acquisition, export_outside_eu] ## enum values changed to be understandable and matching the UI. for current values -- vat_code_0 = not_subject_to_vat ; vat_code_ae = reverse_charge ; vat_code_ue = eu_reverse_charge ; vat_code_e = intracommunity_acquisition ; vat_code_g = export_outside_eu
+          default: null
+        vat_number:
+          type: string
+          description: VAT number for this customer.
+          example: FRXX999999999
+          default: null
+
+    UpdateCustomer:
+      type: object
+      properties:
+        address:
+          type: object
+          description: Address information for this customer.
+          properties:
+            address_line_1: ## renamed from address_1
+              type: string
+              description: Main customer address line.
+              example: 17 rue de la Banque              
+            address_line_2: ## renamed from address_2
+              type: string
+              description: Additional address details for this customer.
+              example: 2nd floor
+            city:
+              description: City address for this customer.
+              type: string
+              example: Paris
+            country_code: ## renamed from address.country.iso_alpha2
+              type: string
+              description: Country code [ISO Alpha-2](https://www.iban.com/country-codes).
+              example: FR
+            postal_code: ## renamed from zipcode
+              type: string
+              description: ZIP / Postal code.
+              example: 75002
+        bank_accounts:
+          type: array
+          description: An array of objects describing the bank accounts linked to this customer. The bank accounts will be displayed in sales invoices for this customer and will be used to receive funds for these sales invoices.
+            
+            NOTE - Only bank accounts that can be used for settlement of sales invoices can be linked to a customer. The list of such accounts can be seen in the Regate app under "Settings" >> "Customize Regate" >> "Account receivable settings".
+          items:
+            properties:
+              id:
+                type: string
+                description: ID of the bank account linked to this customer.  Make a `GET` request to `/bank_accounts` to retrieve the full list of available bank accounts. 
+                example: 123e4567-e89b-12d3-a456-426614174000
+        company_number:
+          type: string
+          description: Customer's company identifier number. Should match the unique identifier used by all public bodies and administrative organisms in their relations with the company. For example, should match the SIREN number for French companies.
+          example: 123456789
+        customer_reference:
+          type: string
+          description: Customer reference. This is an identifier assigned to credit and debit transactions.
+          example: REGATE
+        customer_type: 
+          type: string
+          description: Customer type. Can be `company` or `individual`.
+          enum: [company, individual]
+          default: company
+        external_id:
+          type: string
+          description: External ID for this customer.
+          example: REGATE_1
+        name:
+          type: string
+          description: Customer name.
+          example: Regate.
+        payment_method:
+          type: string
+          description: Payment method selected for this customer in Regate.
+          enum: [bank_transfer, bank_direct_debit, bill_of_exchange, credit_card, bank_check]
+        unit_number:
+          type: string
+          description: Unique identifier used to identify the head office or a specific secondary establishment of the customer's company. For example, for French companies this should match the SIRET number.
+          example: 12345678912345
+        vat_exemption_reason:
+          type: string
+          description: If the customer is exempt from paying VAT, this attribute will return the reason why.
+          enum: [not_subject_to_vat, reverse_charge, eu_reverse_charge, intracommunity_acquisition, export_outside_eu] ## enum values changed to be understandable and matching the UI. for current values -- vat_code_0 = not_subject_to_vat ; vat_code_ae = reverse_charge ; vat_code_ue = eu_reverse_charge ; vat_code_e = intracommunity_acquisition ; vat_code_g = export_outside_eu
+          default: null
+        vat_number:
+          type: string
+          description: VAT number for this customer.
+          example: FRXX999999999
+          default: null
+    
+    OutputCustomer:
+      type: object
+      description: An object containing the attributes of a customer.
+      properties:
+        address:
+          type: object
+          description: Address information for this customer.
+          properties:
+            address_line_1: ## renamed from address_1
+              type: string
+              description: Main customer address line.
+              example: 17 rue de la Banque              
+            address_line_2: ## renamed from address_2
+              type: string
+              description: Additional address details for this customer.
+              example: 2nd floor
+            city:
+              description: City address for this customer.
+              type: string
+              example: Paris
+            country_code:
+              type: string
+              description: Country code [ISO Alpha-2](https://www.iban.com/country-codes).
+              example: FR
+            country_name: 
+              type: string
+              description: Country name. 
+              example: France
+            postal_code: ## renamed from zipcode
+              type: string
+              description: ZIP / Postal code.
+              example: 75002
+        company_number:
+          type: string
+          description: Customer's company identifier number. Should match the unique identifier used by all public bodies and administrative organisms in their relations with the company. For example, should match the SIREN number for French companies.
+          example: 123456789
+        created_at: ## new attribute indicating customer creation date. useful for search
+          type: string
+          format: date-time
+          description: Timestamp indicating when the customer was created.
+        balance_cents:
+          type: integer
+          format: int32
+          description: Customer balance amount (including tax) in cents. Divide by 100 to retrieve the proper amount.
+          example: 10000
+        bank_accounts:
+          type: array
+          description: An array of objects describing the bank accounts linked to this customer. The bank accounts will be displayed in sales invoices for this customer and will be used to receive funds for these sales invoices.
+            
+            NOTE - Only bank accounts that can be used for settlement of sales invoices can be linked to a customer. The list of such accounts can be seen in the Regate app under "Settings" >> "Customize Regate" >> "Account receivable settings".
+          items:
+            properties:
+              bank_name:
+                type: string
+                description: Name of the bank, where this bank account resides.
+                example: BNP PARIBAS PUBLIC SECTOR SCF
+              bic:
+                type: string
+                description: BIC for this bank account.
+                example: BNPAFRPS
+              iban:
+                type: string
+                description: IBAN for this bank account.
+                example: FR8414508000506472869146N07
+              id:
+                type: string
+                description: Unique UUID for this bank account in Regate.
+                example: 123e4567-e89b-12d3-a456-426614174000
+              is_used_for_payment_link:
+                type: boolean
+                description: Indicates if this bank account is displayed by default as a payment link when sending your invoices by email. Only one of your bank accounts can be selected to be used as a payment link.
+        customer_reference:
+          type: string
+          description: Customer reference. This is an identifier assigned to credit and debit transactions.
+          example: REGATE
+        customer_type: ## if this isn't used, we should remove it
+          type: string
+          description: Customer type. Can be `company` or `individual`.
+          enum: [company, individual]
+          default: company
+        discount_condition:
+          type: string
+          description: Text explaining discount conditions. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `discount_condition` for the holding of the user.
+          example: "No discount granted for early payment."
+        external_id:
+          type: string
+          description: External ID for this customer.
+          example: REGATE_1
+        id:
+          type: string
+          description: Unique customer UUID in Regate.
+          example: 9876543a-bc21-0def-98g7-6543hij21kl0 
+        is_archived:   ### new attribute
+          type: boolean
+          description: Indicates whether the customer is archived or not.
+          example: false
+        late_payment_penalties:
+          type: string
+          description: Text explaining late payment penalties. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `late_payment_penalties` for the holding of the user.
+          example: "In the event of non-payment on the due date, penalties calculated at three times the legal interest rate will be applied."
+        legal_fixed_compensation: 
+          type: string
+          description: Text explaining legal fixed compensation. Will be included in the footer of customer invoices linked to this customer. Defaults to the value of `legal_fixed_compensation` for the holding of the user.
+          example: "Any late payment will result in a fixed compensation for recovery costs of €40."
+        name:
+          type: string
+          description: Customer name.
+          example: Regate
+        payment_method:
+          type: string
+          description: Payment method selected for this customer in Regate.
+          enum: [bank_transfer, bank_direct_debit, bill_of_exchange, credit_card, bank_check]
+        unit_number:
+          type: string
+          description: Unique identifier used to identify the head office or a specific secondary establishment of the customer's company. For example, for French companies this should match the SIRET number.
+          example: 12345678912345
+        vat_exemption_reason:
+          type: string
+          description: If the customer is exempt from paying VAT, this attribute will return the reason why.
+          enum: [not_subject_to_vat, reverse_charge, eu_reverse_charge, intracommunity_acquisition, export_outside_eu] ## enum values changed to be understandable and matching the UI. for current values -- vat_code_0 = not_subject_to_vat ; vat_code_ae = reverse_charge ; vat_code_ue = eu_reverse_charge ; vat_code_e = intracommunity_acquisition ; vat_code_g = export_outside_eu
+          default: null
+        vat_number:
+          type: string
+          description: VAT number for this customer.
+          example: FRXX999999999
+          default: null
+        yearly_billed_cents:
+          type: integer
+          format: int64
+          description: Yearly billed amount for this customer (in cents). Divide by 100 to get the proper amount.
+          example: 1500000
+
+
+    ErrorMessage:
+      properties:
+        ErrorMessage:
+          description: Error message describing the error.
+          type: string
+        ErrorCode:
+          description: Error code of the error.
+          type: string
+        ErrorRelatedTo:
+          description: A list of properties to which the error relates.
+          type: array
+          items:
+            type: string
+        ErrorIdentifier:
+          description: Error identifier used for tracing.
+          type: string
+          format: uuid
+        StatusCode:
+          description: Status code for this request.
+          type: integer

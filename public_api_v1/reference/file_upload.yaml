@@ -1,0 +1,127 @@
+## This spec is not implemented, keepin it as a draft for future developments on a specific "file upload" endpoint
+
+openapi: 3.0.0
+info:
+  title: File upload
+  version: "1.0"
+servers: 
+- url: https://api.regate.io/v1
+security:
+  - bearerAuth: []
+paths:
+  /file_upload:
+    post:
+      tags:
+      - File upload
+      summary: Upload a PDF copy of a sales invoice.
+      description: Upload a PDF copy of a sales invoice to the Regate servers. If you want to create an invoice and have a PDF copy attached to it, use this endpoint to upload the file and copy the value of the `id` in the response. Then, when making a `POST /sales_invoice` request, include the copied ID as the value of the `file` attribute.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InputUpload'
+      responses:
+        201:
+          description: File uploaded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OutputUpload"
+        400:
+          description: Bad request. API request was not correctly formatted.
+          $ref: "#/components/responses/BadRequest"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+  responses:
+    BadRequest:
+      description: "Bad input. See ErrorMessage for more information."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    Unauthorized:
+      description: "Your API credentials are not valid. Please review them."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    Forbidden:
+      description: "You don't have permission to access this URL."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    NotFound:
+      description: "URL does not exist."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    ServerError:
+      description: "Something wrong happened on our side, sorry for the inconvenience."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+
+  schemas:
+    InputUpload:
+      type: object
+      required:
+      - file
+      description: An object containing the information needed to upload the file.
+      properties:
+        file:
+          type: string
+          format: binary
+          description: The location and name of the file in your local file system.
+          example: "@/main_folder/subfolder/file.pdf"
+
+    OutputUpload:
+      type: object
+      description: An object containing the attributes of the uploaded file.
+      properties:
+        id:
+          type: string
+          description: Unique UUID for the uploaded file.
+          example: abc1234d-5e67-8f90-g12h-3ij4k5678lmn
+
+    ErrorMessage:
+      properties:
+        ErrorMessage:
+          description: Error message describing the error.
+          type: string
+        ErrorCode:
+          description: Error code of the error.
+          type: string
+        ErrorRelatedTo:
+          description: A list of properties to which the error relates.
+          type: array
+          items:
+            type: string
+        ErrorIdentifier:
+          description: Error identifier used for tracing.
+          type: string
+          format: uuid
+        StatusCode:
+          description: Status code for this request.
+          type: integer

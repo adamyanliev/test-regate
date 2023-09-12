@@ -1,0 +1,197 @@
+openapi: 3.0.0
+info:
+  title: Bank Accounts
+  version: "1.0"
+servers: 
+- url: https://api.regate.io/v1
+security:
+  - bearerAuth: []
+paths:
+  /bank_accounts:
+    get:
+      summary: Retrieve all bank accounts.
+      description: Retrieve a list of bank accounts linked to this holding, which can be used for settlement of sales invoices. Every customer needs a bank account linked to it - it will be used to receive the funds for sales invoices linked to this customer.
+
+        The list of such accounts can be seen in the Regate app under "Settings" >> "Customize Regate" >> "Account receivable settings". 
+      operationId: getBankAccounts
+      tags:
+        - Bank Accounts
+      parameters:
+        - name: page
+          in: query
+          description: Results are paginated. Set the value to the page you want to retieve.
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: Results are paginated. This parameter indicates how many results per page will be returned.
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 1000
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  links:
+                    $ref: "#/components/schemas/Links"
+                  bank_accounts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OutputBankAccounts"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+  /bank_accounts/{bank_account_id}:
+    get:
+      summary: Retrieve a specific bank account
+      description: Retrieve a specific bank account that can be used for settlement of sales invoices. The list of such accounts can be seen in the Regate app under "Settings" >> "Customize Regate" >> "Account receivable settings".
+      operationId: getBankAccount
+      tags:
+        - Bank Accounts
+      parameters:
+        - name: bank_account_id
+          in: path
+          description: Unique UUID of the bank account you want to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bank_account:  
+                    $ref: "#/components/schemas/OutputBankAccounts"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+  responses:
+    BadRequest:
+      description: "Bad input. See ErrorMessage for more information."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    Unauthorized:
+      description: "Your API credentials are not valid. Please review them."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    Forbidden:
+      description: "You don't have permission to access this URL."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    NotFound:
+      description: "URL does not exist."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    ServerError:
+      description: "Something wrong happened on our side, sorry for the inconvenience."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+
+  schemas:
+    Links:
+      type: object
+      description: An object containing links to the URL for the current API call, as well as URL for the first, previous, next and last page of results, if the retrieved objects are too many to be displayed on a single page.
+      properties:
+        self:
+          type: string
+          description: The URL for the current page of results.
+        first:
+          type: string
+          description: The URL for the first page of results.
+        prev:
+          type: string
+          description: The URL for the previous page of results.
+        next:
+          type: string
+          description: The URL for the next page of results.
+        last:
+          type: string
+          description: The URL for the last page of results.
+
+    OutputBankAccounts:
+      type: object
+      description: An object containing the attributes of a bank account.
+      properties:
+        bank_name:
+          type: string
+          description: Name of the bank.
+          example: BNP PARIBAS PUBLIC SECTOR SCF
+        bic:
+          type: string
+          description: Bank Identification Code (BIC).
+          example: BNPAFRPS
+        iban:
+          type: string
+          description: International Bank Account Number (IBAN).
+          example: FR1234567890123456789012A34
+        id:
+          type: string
+          description: Unique UUID for this bank account.
+          example: 12abc3de-4fg5-67hi-8jkl-9mn0o123p456
+
+    ErrorMessage:
+      properties:
+        ErrorMessage:
+          description: Error message describing the error.
+          type: string
+        ErrorCode:
+          description: Error code of the error.
+          type: string
+        ErrorRelatedTo:
+          description: A list of properties to which the error relates.
+          type: array
+          items:
+            type: string
+        ErrorIdentifier:
+          description: Error identifier used for tracing.
+          type: string
+          format: uuid
+        StatusCode:
+          description: Status code for this request.
+          type: integer

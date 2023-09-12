@@ -1,0 +1,357 @@
+openapi: 3.0.0
+info:
+  title: Analytical Plans
+  version: "1.0"
+servers: 
+- url: https://api.regate.io/v1
+security:
+  - bearerAuth: []
+paths:
+  /analytical_plans:
+    get:
+      summary: Retrieve all analytical plans
+      description: Retrieve a list of analytical plans. The returned list is filtered based on the specified query parameters.
+      operationId: getAnalyticalPlans
+      tags:
+        - Analytical plans
+      parameters:
+        - name: filter
+          in: query
+          description: An object that defines the filters to use to retrieve only the items you require. Each field you add will be an additional filter to apply to the request. The filter key needs to be an attribute name (e.g. `label`), followed by an underscore and an operator name (e.g. `eq` for "equals"). For example, if you want to see all items with label `my_label`, the proper syntax will be `?filter[label_eq]=my_label`.
+          
+            For detailed information, please see the [Filtering section](../docs/filtering) in our Guides.
+          required: false
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+          style: deepObject
+          explode: true
+          allowReserved: true
+        - name: page
+          in: query
+          description: Results are paginated. Set the value to the page you want to retieve.
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: Results are paginated. This parameter indicates how many results per page will be returned.
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 1000
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  links:
+                    $ref: "#/components/schemas/Links"
+                  analytical_plans:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OutputPlan"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+  /analytical_plans/{plan_id}:
+    get:
+      summary: Retrieve a specific analytical plan
+      operationId: getAnalyticalPlan
+      tags:
+        - Analytical plans
+      parameters:
+        - name: plan_id
+          in: path
+          description: Unique UUID of the plan you want to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  analytical_plan:  
+                    $ref: "#/components/schemas/OutputPlan"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+  /analytical_plans/{plan_id}/cost_centers:
+    get:
+      summary: Retrieve all cost centers
+      description: Retrieve a list of cost centers associated with a specific analytical plan. The returned list is filtered based on the specified query parameters.
+      operationId: getCostCenters
+      tags:
+        - Analytical plans
+      parameters:
+        - name: plan_id
+          in: path
+          description: Unique UUID of the plan you want to retrieve the cost centers for.
+          required: true
+          schema:
+            type: string
+        - name: filter
+          in: query
+          description: An object that defines the filters to use to retrieve only the items you require. Each field you add will be an additional filter to apply to the request. The filter key needs to be an attribute name (e.g. `label`), followed by an underscore and an operator name (e.g. `eq` for "equals"). For example, if you want to see all items with label `my_label`, the proper syntax will be `?filter[label_eq]=my_label`.
+          
+            For detailed information, please see the [Filtering section](../docs/filtering) in our Guides.
+          required: false
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+          style: deepObject
+          explode: true
+          allowReserved: true
+        - name: page
+          in: query
+          description: Results are paginated. Set the value to the page you want to retieve.
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: Results are paginated. This parameter indicates how many results per page will be returned.
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 1000
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  links:
+                    $ref: "#/components/schemas/Links"
+                  cost_centers:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OutputCostCenter"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+  /analytical_plans/{plan_id}/cost_centers/{cost_center_id}:
+    get:
+      summary: Retrieve a specific cost center
+      operationId: getCostCenter
+      tags:
+        - Analytical plans
+      parameters:
+        - name: plan_id
+          in: path
+          description: Unique UUID of the plan you want to retrieve the cost center for.
+          required: true
+          schema:
+            type: string
+        - name: cost_center_id
+          in: path
+          description: Unique UUID of the cost center you want to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cost_center:  
+                    $ref: "#/components/schemas/OutputCostCenter"
+        401:
+          description: Unauthorized request. Token is missing or is invalid.
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          description: Authentication was successful, but the user does not have permission to access the URL.
+          $ref: "#/components/responses/Forbidden"
+        500:
+          description: Server error, please try again later.
+          $ref: "#/components/responses/ServerError"
+
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+  responses:
+    BadRequest:
+      description: "Bad input. See ErrorMessage for more information."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    Unauthorized:
+      description: "Your API credentials are not valid. Please review them."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    Forbidden:
+      description: "You don't have permission to access this URL."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    NotFound:
+      description: "URL does not exist."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    ServerError:
+      description: "Something wrong happened on our side, sorry for the inconvenience."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+    NotModified:
+      description: "The object was not modified."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+
+  schemas:
+    Links:
+      type: object
+      description: An object containing links to the URL for the current API call, as well as URL for the first, previous, next and last page of results, if the retrieved objects are too many to be displayed on a single page.
+      properties:
+        self:
+          type: string
+          description: The URL for the current page of results.
+        first:
+          type: string
+          description: The URL for the first page of results.
+        prev:
+          type: string
+          description: The URL for the previous page of results.
+        next:
+          type: string
+          description: The URL for the next page of results.
+        last:
+          type: string
+          description: The URL for the last page of results.
+
+    OutputPlan:
+      type: object
+      description: An object containing the attributes of an analytical plan.
+      properties:
+        cost_centers_count:
+          type: integer
+          description: Indicates how many cost centers are associated with this analytical plan.
+          example: 2
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the analytical plan was created.
+          example: 2023-01-31T23:59:59.000Z
+        created_by:
+          type: string
+          description: The name of the user, who created this plan.
+          example: John Doe
+        id:
+          type: string
+          description: Unique UUID for this analytical plan.
+          example: 1234a56b-cd7e-890f-1234-5g6789hij0kl
+        is_active:
+          type: boolean
+          description: Indicates whether the analytical plan is active or not.
+          example: true
+        name:
+          type: string
+          description: The name for this analytical plan.
+          example: My plan's name
+        
+    OutputCostCenter:
+      type: object
+      description: An object containing the attributes of a cost center.
+      properties:
+        analytical_plan_name:
+          type: string
+          description: Name of the analytical plan, to which this cost center belongs.
+          example: My plan's name
+        analytical_plan_id:
+          type: string
+          description: Unique UUID for the analytical plan, to which the cost center belongs.
+          example: 1234a56b-cd7e-890f-1234-5g6789hij0kl
+        code:
+          type: string
+          description: The analytic code for this cost center.
+          example: MKT00
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the cost center was created.
+          example: 2023-01-31T23:59:59.000Z
+        id:
+          type: string
+          description: Unique UUID for this cost center.
+          example: 9876a54b-cd3e-210f-9876-5g4321hij0kl
+        name:
+          type: string
+          description: Name of this cost center.
+          example: Marketing
+
+    ErrorMessage:
+      properties:
+        ErrorMessage:
+          description: Error message describing the error.
+          type: string
+        ErrorCode:
+          description: Error code of the error.
+          type: string
+        ErrorRelatedTo:
+          description: A list of properties to which the error relates.
+          type: array
+          items:
+            type: string
+        ErrorIdentifier:
+          description: Error identifier used for tracing.
+          type: string
+          format: uuid
+        StatusCode:
+          description: Status code for this request.
+          type: integer
